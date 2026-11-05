@@ -48,7 +48,7 @@ export const site = {
   currency: { code: "INR", symbol: "₹", locale: "en-IN" },
 
   /** PLACEHOLDER: country code + number, digits only. No +, no spaces. */
-  whatsappNumber: "910000000000",
+  whatsappNumber: "917579194871",
 
   /** PLACEHOLDER: for general questions. Orders come through WhatsApp only. */
   email: "hello@alderworn.example",
