@@ -58,7 +58,7 @@ Pages: home, `/women`, `/men`, category and product pages under each section, `/
 
 ## Before going live
 
-- [ ] Replace the 24 sample products (12 women, 12 men). They are invented, including their brand labels,
+- [ ] Replace the 11 sample products (2 women, 9 men). They are invented, including their brand labels,
       and they use flat colour panels because there are no real photos yet. With the real WhatsApp number
       set, customers could send requests for them.
 - [ ] Set the placeholder values listed above.

@@ -62,8 +62,8 @@ edit it.
 {
   code: "AW-W-0148",            // AW-W-… for women, AW-M-… for men. Must be unique.
   section: "women",             // "women" or "men"
-  category: "Knitwear",         // Must match a category below, exactly
-  title: "Grey mohair jumper",
+  category: "Shirts",           // Must match a category below, exactly
+  title: "Grey flannel shirt",
   label: "Unbranded",           // Brand on the tag, or "Unbranded"
   era: "1980s",
   sizes: [{ label: "M", available: true }], // As on the tag. One entry for a one-of-one piece.
@@ -71,7 +71,7 @@ edit it.
                                 // can add its own measurements: { ... }. With no size
                                 // available, the piece counts as sold.
   measurements: { chest: 52, length: 60, shoulder: 44, sleeve: 56 }, // cm, laid flat
-  fabric: "Mohair blend",
+  fabric: "Wool flannel",
   condition: "B",               // A = near new, B = lightly worn, C = worn, marks noted
   flaws: "Small pull on the hem.", // Honest text. Use "" if there are none.
   price: 2600,                  // Rupees, no commas
@@ -84,8 +84,8 @@ edit it.
 
 Categories:
 
-- **Women:** Dresses, Knitwear, Coats & Jackets, Shirts & Blouses, Skirts & Trousers, Bags & Scarves
-- **Men:** Shirts, Knitwear, Coats & Jackets, Tailoring, Trousers, Accessories
+- **Women:** Jackets, Shirts, Trousers
+- **Men:** Shirts, Jackets, Tailoring, Trousers, Accessories
 
 Measurement keys are `chest`, `length`, `shoulder`, `sleeve`, `waist`, `inseam`, `width` and `height`.
 Include whichever apply.

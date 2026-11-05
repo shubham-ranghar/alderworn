@@ -1,0 +1,18 @@
+# Categories that no longer exist. Cloudflare Pages reads this file; next.config redirects
+# do not work with a static export.
+/women/dresses /women 301
+/women/dresses/ /women 301
+/women/knitwear /women 301
+/women/knitwear/ /women 301
+/women/coats-jackets /women 301
+/women/coats-jackets/ /women 301
+/women/shirts-blouses /women 301
+/women/shirts-blouses/ /women 301
+/women/skirts-trousers /women 301
+/women/skirts-trousers/ /women 301
+/women/bags-scarves /women 301
+/women/bags-scarves/ /women 301
+/men/knitwear /men 301
+/men/knitwear/ /men 301
+/men/coats-jackets /men 301
+/men/coats-jackets/ /men 301

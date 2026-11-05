@@ -39,9 +39,17 @@ function EntryPanel({
       className={`group relative flex min-h-[72svh] flex-col overflow-hidden p-(--gutter) md:min-h-svh ${tone === "cream" ? "bg-cream" : "bg-taupe"} ${align === "end" ? "justify-end" : "justify-between"}`}
     >
       {image ? (
-        <Image src={image} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(min-width: 768px) 50vw, 100vw"
+          className="object-cover"
+        />
       ) : null}
-      <span className={`relative flex justify-between ${align === "end" ? "order-2 mt-auto" : ""}`}>
+      <span
+        className={`relative flex justify-between ${align === "end" ? "order-2 mt-auto" : ""}`}
+      >
         <span className="type-label">{word}</span>
         <span className="type-data">{pieces(count)}</span>
       </span>
@@ -73,7 +81,11 @@ export default function HomePage() {
           /* Holds the row's height for the fixed seal below, so the headline stays put. */
           tr: <Seal className="invisible" />,
           bl: "One of each",
-          bc: <p className="type-body max-md:max-w-[9rem]">One of each. Never restocked.</p>,
+          bc: (
+            <p className="type-body max-md:max-w-[9rem]">
+              One of each. Never restocked.
+            </p>
+          ),
           br: (
             <span>
               <Link href="/women" className="link">
@@ -148,7 +160,10 @@ export default function HomePage() {
             className="md:col-span-4 md:col-start-2"
           />
         </div>
-        <ProductRow products={drop} label={`Pieces from ${dropName(currentDrop)}`} />
+        <ProductRow
+          products={drop}
+          label={`Pieces from ${dropName(currentDrop)}`}
+        />
       </section>
 
       {/* How it works */}
@@ -163,7 +178,9 @@ export default function HomePage() {
             size="type-h2 text-[clamp(1.75rem,3.2vw,3rem)]!"
           />
           {/* The negative margin stops the trailing letter-space pulling it off the gutter. */}
-          <p className="type-label mr-[-0.2em] tracking-[0.2em]!">The process</p>
+          <p className="type-label mr-[-0.2em] tracking-[0.2em]!">
+            The process
+          </p>
         </div>
         <ol className="mt-10 grid grid-cols-1 border-t border-ink min-[400px]:grid-cols-2 md:mt-14 lg:grid-cols-4">
           {ORDER_STEPS.map((step, i) => (
@@ -177,7 +194,9 @@ export default function HomePage() {
               <h3 className="mt-5 text-[12px] font-[500] uppercase leading-[1.35] tracking-[0.2em]">
                 {STEP_TITLES[i]}
               </h3>
-              <p className="mt-2 max-w-[28ch] text-[17px] leading-[1.5] text-ink text-pretty">{step}</p>
+              <p className="mt-2 max-w-[28ch] text-[17px] leading-[1.5] text-ink text-pretty">
+                {step}
+              </p>
             </li>
           ))}
         </ol>

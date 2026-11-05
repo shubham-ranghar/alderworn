@@ -4,7 +4,7 @@ import { ScriptLockup, StackLockup } from "@/components/Lockups";
 import { ProductCard } from "@/components/ProductCard";
 import { Seal } from "@/components/Seal";
 import { Wordmark } from "@/components/Wordmark";
-import { products } from "@/data/products";
+import { products, type Product, type Status } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "Styleguide",
@@ -31,9 +31,11 @@ function Heading({ n, children }: { n: string; children: string }) {
 }
 
 export default function StyleguidePage() {
-  const available = products.find((p) => p.status === "available")!;
-  const hold = products.find((p) => p.status === "on-hold")!;
-  const sold = products.find((p) => p.status === "sold")!;
+  // The catalogue may not hold a piece in every status, so one piece demonstrates all three.
+  const states: Product[] = (["available", "on-hold", "sold"] as Status[]).map((status) => ({
+    ...products[0],
+    status,
+  }));
 
   return (
     <div className="pb-24">
@@ -248,8 +250,8 @@ export default function StyleguidePage() {
 
       <Heading n="05">Product card states</Heading>
       <ul className="grid grid-cols-2 border-t border-line md:grid-cols-4">
-        {[available, hold, sold].map((p) => (
-          <li key={p.code} className="border-r border-b border-line">
+        {states.map((p) => (
+          <li key={p.status} className="border-r border-b border-line">
             <ProductCard product={p} />
           </li>
         ))}

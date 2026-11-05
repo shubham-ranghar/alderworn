@@ -152,6 +152,10 @@ function ListingView({
         <div className="-mt-px">
           <ProductGrid products={shown} />
         </div>
+      ) : products.length === 0 ? (
+        <div className="px-(--gutter) py-20">
+          <p className="type-title">New pieces arrive with the next drop.</p>
+        </div>
       ) : (
         <div className="px-(--gutter) py-20">
           <p className="type-title">Nothing fits that.</p>

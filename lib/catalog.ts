@@ -1,29 +1,32 @@
-import { products, type Condition, type Product, type Section, type Status } from "@/data/products";
+import {
+  products,
+  type Condition,
+  type Product,
+  type ProductCategory,
+  type Section,
+  type Status,
+} from "@/data/products";
 import { site } from "@/config/site";
 
 export type Category = {
-  name: string;
+  name: ProductCategory;
   slug: string;
 };
 
 export const toSlug = (name: string) =>
   name.toLowerCase().replace(/&/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 
-const cat = (name: string): Category => ({ name, slug: toSlug(name) });
+const cat = (name: ProductCategory): Category => ({ name, slug: toSlug(name) });
 
 export const categories: Record<Section, Category[]> = {
   women: [
-    cat("Dresses"),
-    cat("Knitwear"),
-    cat("Coats & Jackets"),
-    cat("Shirts & Blouses"),
-    cat("Skirts & Trousers"),
-    cat("Bags & Scarves"),
+    cat("Jackets"),
+    cat("Shirts"),
+    cat("Trousers"),
   ],
   men: [
     cat("Shirts"),
-    cat("Knitwear"),
-    cat("Coats & Jackets"),
+    cat("Jackets"),
     cat("Tailoring"),
     cat("Trousers"),
     cat("Accessories"),
