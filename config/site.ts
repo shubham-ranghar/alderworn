@@ -50,7 +50,7 @@ export const site = {
   /** PLACEHOLDER: country code + number, digits only. No +, no spaces. */
   whatsappNumber: "910000000000",
 
-  /** PLACEHOLDER */
+  /** PLACEHOLDER: for general questions. Orders come through WhatsApp only. */
   email: "hello@alderworn.example",
 
   /** PLACEHOLDER */

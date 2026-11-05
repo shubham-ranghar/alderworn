@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { holdWindow, SHIPPING_FEE } from "@/config/site";
-import { bagMessage, mailtoUrl, whatsappUrl, type Customer } from "@/lib/bagMessage";
+import { bagMessage, whatsappUrl, type Customer } from "@/lib/bagMessage";
 import { formatPrice, pieces, productHref } from "@/lib/catalog";
 import { useBag } from "./BagProvider";
 import { ProductImage } from "./ProductImage";
@@ -15,8 +15,6 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
   const [customer, setCustomer] = useState<Customer>(EMPTY);
   // The bag and link a request was sent with. Changing the bag brings the form back.
   const [sent, setSent] = useState<{ bag: string; url: string } | null>(null);
-  const [emailOpened, setEmailOpened] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
   const uid = useId();
 
@@ -76,14 +74,7 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
     e.preventDefault();
     const url = whatsappUrl(bagMessage(open, customer));
     window.open(url, "_blank", "noopener");
-    setEmailOpened(false);
     setSent({ bag: bagKey, url });
-  };
-
-  const sendEmail = () => {
-    if (!formRef.current?.reportValidity()) return;
-    window.location.href = mailtoUrl(bagMessage(open, customer));
-    setEmailOpened(true);
   };
 
   const input = (
@@ -196,7 +187,7 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
           them for {holdWindow} and send UPI details. Prepaid orders only.
         </p>
 
-        <form ref={formRef} onSubmit={sendWhatsapp} className="mt-8 flex flex-col gap-5">
+        <form onSubmit={sendWhatsapp} className="mt-8 flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
             {input("name", "Name", "name", { className: "col-span-2" })}
             {input("phone", "Phone", "tel", {
@@ -243,17 +234,6 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
           <button type="submit" disabled={open.length === 0} className="btn disabled:btn-off">
             Send request on WhatsApp
           </button>
-          <button
-            type="button"
-            onClick={sendEmail}
-            disabled={open.length === 0}
-            className="type-label link w-fit self-center py-1 disabled:text-muted"
-          >
-            or send by email
-          </button>
-          <p role="status" className="type-body min-h-[1.55em] text-center">
-            {emailOpened ? "Your email app should now be open with this request." : ""}
-          </p>
         </form>
       </div>
     </div>

@@ -13,9 +13,16 @@ next-env.d.ts
 # Environment files and secrets
 .env
 .env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+secrets.*
 
-# Vercel
-.vercel/
+# Cloudflare local preview
+.wrangler/
 
 # Logs
 npm-debug.log*

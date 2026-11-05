@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "postbuild": "node scripts/flatten-export.mjs",
+    "preview": "npx wrangler pages dev out"
   },
   "dependencies": {
     "next": "^16.4.5",

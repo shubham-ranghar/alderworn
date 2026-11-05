@@ -42,6 +42,3 @@ export function bagMessage(items: Product[], c: Customer) {
 
 export const whatsappUrl = (message: string) =>
   `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-export const mailtoUrl = (message: string) =>
-  `mailto:${site.email}?subject=${encodeURIComponent(`${site.name} bag request`)}&body=${encodeURIComponent(message)}`;

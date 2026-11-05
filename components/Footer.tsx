@@ -58,8 +58,14 @@ export function Footer() {
         />
       </div>
 
-      <div className="border-t border-line px-(--gutter) py-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-line px-(--gutter) py-3">
         <p className="type-label">© 2026 ALDERWORN. All pieces pre-owned.</p>
+        <p className="type-label">
+          Questions:{" "}
+          <a href={`mailto:${site.email}`} className="link normal-case">
+            {site.email}
+          </a>
+        </p>
       </div>
     </footer>
   );

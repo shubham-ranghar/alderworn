@@ -9,7 +9,8 @@ confirm and hold the pieces, and they pay by UPI. Orders are prepaid only, with 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # production build
+npm run build    # static site, written to /out
+npm run preview  # serve /out the way Cloudflare Pages will (run build first)
 ```
 
 ## Change the WhatsApp number and email
@@ -19,7 +20,7 @@ Open `config/site.ts` and replace every value marked `PLACEHOLDER`:
 | Setting          | Format                                                     |
 | ---------------- | ---------------------------------------------------------- |
 | `whatsappNumber` | Country code + number, digits only: `919876543210`         |
-| `email`          | Where "or send by email" requests go                       |
+| `email`          | General questions. Shown in the footer and `/info` Contact |
 | `instagramUrl`   | Your full profile link                                     |
 | `url`            | Your live domain                                           |
 
@@ -106,17 +107,59 @@ their bag will see that it can no longer be requested.
 
 Photo 1 is the main image. Photo 2 appears on hover in the grid.
 
+**Resize photos before adding them.** The site has no server to shrink images, so customers download
+each file exactly as you upload it. Aim for about 1600px on the long edge and under 500 KB. Phone
+photos straight from the camera will make pages slow. Cloudflare also rejects any single file over
+25 MiB.
+
 For the home page Women and Men panels, add photos to `public/home/` and set `homeImages` in
 `config/site.ts`, for example `women: "/home/women.jpg"`.
 
-## Deploy on Vercel
+## Deploy on Cloudflare Pages
 
-1. Push this folder to a GitHub repository.
-2. On [vercel.com](https://vercel.com), choose **Add New → Project** and import the repository.
-3. Keep the detected Next.js settings and click **Deploy**.
-4. Add your domain under **Settings → Domains**, then set `url` in `config/site.ts` to match.
+The site is a fully static export, so Cloudflare only hosts files. There is no server to run.
 
-Every later push redeploys the site. That is how a catalogue edit goes live.
+### First deployment
+
+1. Push this repository to GitHub.
+2. In the [Cloudflare dashboard](https://dash.cloudflare.com), go to **Workers & Pages** and choose
+   **Create application**.
+3. Select the **Pages** tab, then **Import an existing Git repository**. Authorise GitHub if asked.
+4. Select the repository and choose **Begin setup**.
+5. Enter these build settings:
+
+   | Setting                | Value                         |
+   | ---------------------- | ----------------------------- |
+   | Production branch      | `main`                        |
+   | Framework preset       | Next.js (Static HTML Export)  |
+   | Build command          | `npx next build`              |
+   | Build output directory | `out`                         |
+
+6. Choose **Save and Deploy**. When the build finishes, the site is live at
+   `https://<your-project>.pages.dev`.
+
+**Node version:** nothing to set. The `.node-version` file in this repository tells Cloudflare to use
+Node 22. To change it, edit that file.
+
+### Publishing changes
+
+Every push to `main` rebuilds and redeploys the site. That is how a catalogue edit goes live. The free
+plan allows 500 builds a month, one at a time.
+
+### Add a custom domain later
+
+1. Go to **Workers & Pages**, select the project, and open **Custom domains**.
+2. Choose **Set up a domain**, enter the domain, and choose **Continue**.
+3. Then follow the case that applies:
+   - **Root domain (`alderworn.com`):** the domain must be added to the same Cloudflare account, with
+     its nameservers pointed to Cloudflare. Cloudflare then creates the DNS record for you.
+   - **Subdomain (`shop.alderworn.com`):** the domain can stay with your current DNS provider. Add a
+     CNAME record from `shop` to `<your-project>.pages.dev`. If the domain is already on Cloudflare,
+     the record is added for you.
+4. Set `url` in `config/site.ts` to the new domain and push.
+
+Always add the domain in the Pages dashboard first. Adding the CNAME record before that causes a 522
+error.
 
 ## Before going live
 
@@ -137,8 +180,9 @@ Every later push redeploys the site. That is how a catalogue edit goes live.
 | `config/site.ts`         | Contact details, currency, season, home images              |
 | `data/products.ts`       | The catalogue                                               |
 | `lib/catalog.ts`         | Categories, price format, drop logic                        |
-| `lib/bagMessage.ts`      | The WhatsApp and email message format                       |
+| `lib/bagMessage.ts`      | The WhatsApp message format                                 |
 | `app/globals.css`        | Colour tokens and type styles                               |
+| `scripts/flatten-export.mjs` | Fixes a Next.js export bug on Windows. Does nothing on Linux |
 | `/styleguide`            | Fonts, scale, colours, buttons, card states (not linked)    |
 
 ## Design rules worth keeping
