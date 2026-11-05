@@ -53,14 +53,23 @@ export const site = {
   /** PLACEHOLDER: for general questions. Orders come through WhatsApp only. */
   email: "hello@alderworn.example",
 
+  /**
+   * PLACEHOLDER: Web3Forms access key. Drop list signups are emailed to the inbox
+   * the key was created for. The form shows an error until this is set.
+   */
+  dropListAccessKey: "" as string,
+
   /** PLACEHOLDER */
   instagramUrl: "https://instagram.com/alderworn",
 
   /**
-   * Home page Women / Men panels. Leave null for a flat colour panel, or point
-   * at a photo in /public, e.g. "/home/women.jpg".
+   * Home page photos. The hero needs a landscape photo with the subject on the
+   * right and empty space on the left for the headline. For the Women / Men panels,
+   * leave null for a flat colour panel, or point at a photo in /public,
+   * e.g. "/home/women.jpg".
    */
   homeImages: {
+    hero: "/home/hero.jpg",
     women: null as string | null,
     men: null as string | null,
   },

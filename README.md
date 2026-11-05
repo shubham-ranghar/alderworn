@@ -23,6 +23,11 @@ Open `config/site.ts` and replace every value marked `PLACEHOLDER`:
 | `email`          | General questions. Shown in the footer and `/info` Contact |
 | `instagramUrl`   | Your full profile link                                     |
 | `url`            | Your live domain                                           |
+| `dropListAccessKey` | Web3Forms key that emails you each drop list signup. See below |
+
+To get signup emails, create an access key at https://web3forms.com using the inbox that should receive
+them, then paste it into `dropListAccessKey`. The key is meant for browser use and doesn't reveal your
+address. Until it is set, the footer form shows an error instead of a confirmation.
 
 The currency symbol and number format are in the same file. `season` sets the `FW—26` corner label.
 
@@ -61,7 +66,10 @@ edit it.
   title: "Grey mohair jumper",
   label: "Unbranded",           // Brand on the tag, or "Unbranded"
   era: "1980s",
-  size: "M",                    // As written on the tag
+  sizes: [{ label: "M", available: true }], // As on the tag. One entry for a one-of-one piece.
+                                // Several sizes: list each. A size that measures differently
+                                // can add its own measurements: { ... }. With no size
+                                // available, the piece counts as sold.
   measurements: { chest: 52, length: 60, shoulder: 44, sleeve: 56 }, // cm, laid flat
   fabric: "Mohair blend",
   condition: "B",               // A = near new, B = lightly worn, C = worn, marks noted
@@ -111,6 +119,9 @@ Photo 1 is the main image. Photo 2 appears on hover in the grid.
 each file exactly as you upload it. Aim for about 1600px on the long edge and under 500 KB. Phone
 photos straight from the camera will make pages slow. Cloudflare also rejects any single file over
 25 MiB.
+
+The home page hero photo is `public/home/hero.jpg`. To replace it, use a landscape photo with the
+subject on the right and empty space on the left for the headline.
 
 For the home page Women and Men panels, add photos to `public/home/` and set `homeImages` in
 `config/site.ts`, for example `women: "/home/women.jpg"`.
@@ -167,11 +178,10 @@ error.
 - Set your real `SHIPPING_FEE`. The site currently shows a placeholder of ₹150.
 - Read the shipping and FAQ text in `app/info/page.tsx`. The tracked courier, paper packaging and
   buying question are drafts. Make them match what you actually do.
-- Read the brand story in `app/about/page.tsx`.
 - Replace the seed products in `data/products.ts`. They are invented examples, and their labels are
   made up.
-- The drop list form only shows its confirmation message. It doesn't store addresses yet. To collect
-  them, connect `components/DropList.tsx` to a mailing list service.
+- Set `dropListAccessKey`, then join the drop list from the live site and check the email arrives.
+  Signups reach you as individual emails. There is no mailing list, so drop messages are sent by hand.
 
 ## Where things live
 

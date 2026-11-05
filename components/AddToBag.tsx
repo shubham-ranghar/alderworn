@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { dispatchWindow, site } from "@/config/site";
-import type { Product } from "@/data/products";
+import type { Product, ProductSize } from "@/data/products";
+import { statusOf } from "@/lib/catalog";
 import { useBag } from "./BagProvider";
 
-export function AddToBag({ product }: { product: Product }) {
+export function AddToBag({ product, size }: { product: Product; size: ProductSize | null }) {
   const { has, add, openDrawer } = useBag();
+  const status = statusOf(product);
 
-  if (product.status === "sold") {
+  if (status === "sold") {
     return (
       <p className="btn btn-off" aria-disabled="true">
         <span>
@@ -21,7 +23,7 @@ export function AddToBag({ product }: { product: Product }) {
     );
   }
 
-  if (product.status === "on-hold") {
+  if (status === "on-hold") {
     const text = encodeURIComponent(`Hello. Is ${product.code} still on hold?`);
     return (
       <p className="btn btn-off" aria-disabled="true">
@@ -42,7 +44,11 @@ export function AddToBag({ product }: { product: Product }) {
 
   return (
     <>
-      {has(product.code) ? (
+      {!size ? (
+        <button type="button" disabled className="btn btn-off">
+          Select a size
+        </button>
+      ) : has(product.code, size.label) ? (
         <Link href="/bag" className="btn btn-quiet">
           In your bag — view bag
         </Link>
@@ -51,7 +57,7 @@ export function AddToBag({ product }: { product: Product }) {
           type="button"
           className="btn"
           onClick={() => {
-            add(product.code);
+            add(product.code, size.label);
             openDrawer();
           }}
         >

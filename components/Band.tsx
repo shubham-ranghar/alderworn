@@ -17,11 +17,14 @@ export function Band({
   tone = "cream",
   labels = {},
   className = "",
+  contentClassName = "relative",
   children,
 }: {
   tone?: "cream" | "taupe";
   labels?: BandLabels;
   className?: string;
+  /** Positioning of the content area. A static area lets children fill the whole band. */
+  contentClassName?: string;
   children: ReactNode;
 }) {
   const bg = tone === "taupe" ? "bg-taupe" : "bg-cream";
@@ -34,7 +37,7 @@ export function Band({
         <div className="text-center">{labels.tc}</div>
         <div className="flex justify-end text-right">{labels.tr}</div>
       </div>
-      <div className="relative flex min-w-0 flex-1 flex-col justify-center">{children}</div>
+      <div className={`flex min-w-0 flex-1 flex-col justify-center ${contentClassName}`}>{children}</div>
       <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-end gap-3">
         <div className="type-label">{labels.bl}</div>
         <div className="text-center">{labels.bc}</div>

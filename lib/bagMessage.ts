@@ -1,6 +1,9 @@
 import { SHIPPING_FEE, site } from "@/config/site";
-import type { Product } from "@/data/products";
+import type { Product, ProductSize } from "@/data/products";
 import { formatPrice } from "./catalog";
+
+/** One line in the bag: a product in one size. */
+export type BagLine = { product: Product; size: ProductSize };
 
 export type Customer = {
   name: string;
@@ -11,13 +14,13 @@ export type Customer = {
   note: string;
 };
 
-export function bagMessage(items: Product[], c: Customer) {
-  const subtotal = items.reduce((sum, p) => sum + p.price, 0);
-  const lines = items.map((p, i) =>
+export function bagMessage(lines: BagLine[], c: Customer) {
+  const subtotal = lines.reduce((sum, l) => sum + l.product.price, 0);
+  const text = lines.map(({ product: p, size }, i) =>
     [
       `${i + 1}. ${p.code}`,
       `   ${p.title}`,
-      `   Size: ${p.size}`,
+      `   Size: ${size.label}`,
       `   ${formatPrice(p.price)}`,
     ].join("\n"),
   );
@@ -25,9 +28,9 @@ export function bagMessage(items: Product[], c: Customer) {
   return [
     `${site.name}: bag request`,
     "",
-    lines.join("\n\n"),
+    text.join("\n\n"),
     "",
-    `Subtotal: ${formatPrice(subtotal)} (${items.length} ${items.length === 1 ? "piece" : "pieces"})`,
+    `Subtotal: ${formatPrice(subtotal)} (${lines.length} ${lines.length === 1 ? "piece" : "pieces"})`,
     `Shipping: ${formatPrice(SHIPPING_FEE)}`,
     `Total: ${formatPrice(subtotal + SHIPPING_FEE)}`,
     "",

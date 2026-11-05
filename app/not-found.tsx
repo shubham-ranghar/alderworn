@@ -17,7 +17,7 @@ export default function NotFound() {
         word="elsewhere."
         wordClass="type-mega-fit [--fit:16vw]"
         scriptStyle={{ fontSize: "1.9em", top: "-0.82em", left: "0.1em", rotate: "-7deg" }}
-        className="mt-[0.9em]"
+        className="mt-[calc(1.67em+0.75rem)]"
       />
       <div className="grid gap-4 md:grid-cols-12 md:items-end">
         <p className="type-body md:col-span-4 md:col-start-5">This piece found a new owner.</p>

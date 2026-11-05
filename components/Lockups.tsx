@@ -34,7 +34,7 @@ export function StackLockup({
 
 /**
  * Reference-1 top lockup: formal script overlapping a heavy Kalnia word.
- * Production use is limited to four places: home, women, men, 404.
+ * Production use is limited to two places: home, 404.
  */
 export function ScriptLockup({
   script,

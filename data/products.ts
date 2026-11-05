@@ -18,6 +18,14 @@ export type Measurements = Partial<
   >
 >;
 
+export type ProductSize = {
+  /** As written on the tag. */
+  label: string;
+  available: boolean;
+  /** Only if this size measures differently. Replaces the product's measurements. */
+  measurements?: Measurements;
+};
+
 export type Product = {
   code: string;
   section: Section;
@@ -26,8 +34,8 @@ export type Product = {
   /** Brand on the tag, or "Unbranded". */
   label: string;
   era: string;
-  /** As written on the tag. */
-  size: string;
+  /** A one-of-one piece has a single entry. */
+  sizes: ProductSize[];
   /** Centimetres, laid flat. Include whichever apply. */
   measurements: Measurements;
   fabric: string;
@@ -59,7 +67,16 @@ export const products: Product[] = [
     title: "Ivory poplin shirt",
     label: "Unbranded",
     era: "2000s",
-    size: "M",
+    sizes: [
+      {
+        label: "S",
+        available: true,
+        measurements: { chest: 47, length: 66, shoulder: 39, sleeve: 59 },
+      },
+      { label: "M", available: true },
+      { label: "L", available: false },
+      { label: "XL", available: true },
+    ],
     measurements: { chest: 50, length: 68, shoulder: 41, sleeve: 60 },
     fabric: "100% cotton poplin",
     condition: "A",
@@ -77,7 +94,11 @@ export const products: Product[] = [
     title: "Black crepe shift dress",
     label: "Lindqvist",
     era: "1990s",
-    size: "UK 10",
+    sizes: [
+      { label: "UK 8", available: false },
+      { label: "UK 10", available: true },
+      { label: "UK 12", available: true },
+    ],
     measurements: { chest: 45, waist: 39, length: 94, shoulder: 37 },
     fabric: "Viscose crepe, acetate lining",
     condition: "A",
@@ -95,7 +116,7 @@ export const products: Product[] = [
     title: "Silk-print blouse",
     label: "Unbranded",
     era: "1970s",
-    size: "S",
+    sizes: [{ label: "S", available: true }],
     measurements: { chest: 46, length: 62, shoulder: 39, sleeve: 57 },
     fabric: "100% silk. Handwritten care tag.",
     condition: "C",
@@ -113,7 +134,7 @@ export const products: Product[] = [
     title: "Camel wool overcoat",
     label: "Maison Verel",
     era: "1980s",
-    size: "40",
+    sizes: [{ label: "40", available: true }],
     measurements: { chest: 56, length: 112, shoulder: 44, sleeve: 60 },
     fabric: "90% wool, 10% cashmere. Viscose lining.",
     condition: "B",
@@ -131,7 +152,7 @@ export const products: Product[] = [
     title: "Pleated wool skirt",
     label: "Harlow & Finch",
     era: "1980s",
-    size: "UK 12",
+    sizes: [{ label: "UK 12", available: true }],
     measurements: { waist: 37, length: 74 },
     fabric: "100% wool. Side zip, metal.",
     condition: "A",
@@ -149,7 +170,7 @@ export const products: Product[] = [
     title: "Cream cable-knit cardigan",
     label: "Unbranded",
     era: "1990s",
-    size: "M",
+    sizes: [{ label: "M", available: true }],
     measurements: { chest: 54, length: 66, shoulder: 46, sleeve: 58 },
     fabric: "100% wool. Horn-effect buttons.",
     condition: "B",
@@ -167,7 +188,7 @@ export const products: Product[] = [
     title: "Houndstooth wool trousers",
     label: "Harlow & Finch",
     era: "1980s",
-    size: "UK 10",
+    sizes: [{ label: "UK 10", available: true }],
     measurements: { waist: 36, inseam: 76, length: 104 },
     fabric: "Wool, half lined",
     condition: "B",
@@ -185,7 +206,7 @@ export const products: Product[] = [
     title: "Lambswool roll-neck",
     label: "Lindqvist",
     era: "1990s",
-    size: "S",
+    sizes: [{ label: "S", available: true }],
     measurements: { chest: 45, length: 60, shoulder: 40, sleeve: 56 },
     fabric: "100% lambswool",
     condition: "A",
@@ -203,7 +224,7 @@ export const products: Product[] = [
     title: "Polka-dot tea dress",
     label: "Unbranded",
     era: "1970s",
-    size: "UK 12",
+    sizes: [{ label: "UK 12", available: true }],
     measurements: { chest: 47, waist: 38, length: 112, shoulder: 38, sleeve: 44 },
     fabric: "Polyester crepe. Self-covered buttons.",
     condition: "B",
@@ -221,7 +242,7 @@ export const products: Product[] = [
     title: "Leather top-handle bag",
     label: "Corvin",
     era: "1980s",
-    size: "One size",
+    sizes: [{ label: "One size", available: true }],
     measurements: { width: 26, height: 19 },
     fabric: "Calf leather, suede lining, brass clasp",
     condition: "C",
@@ -239,7 +260,7 @@ export const products: Product[] = [
     title: "Silk twill scarf",
     label: "Maison Verel",
     era: "1980s",
-    size: "One size",
+    sizes: [{ label: "One size", available: true }],
     measurements: { length: 88, width: 88 },
     fabric: "100% silk twill, hand-rolled edge",
     condition: "A",
@@ -257,7 +278,7 @@ export const products: Product[] = [
     title: "Navy wool peacoat",
     label: "Unbranded",
     era: "1990s",
-    size: "M",
+    sizes: [{ label: "M", available: true }],
     measurements: { chest: 53, length: 78, shoulder: 43, sleeve: 61 },
     fabric: "80% wool, 20% nylon",
     condition: "B",
@@ -277,7 +298,7 @@ export const products: Product[] = [
     title: "Silk repp tie",
     label: "Ashby Tailors",
     era: "1990s",
-    size: "One size",
+    sizes: [{ label: "One size", available: true }],
     measurements: { length: 146, width: 9 },
     fabric: "100% silk, wool interlining",
     condition: "A",
@@ -295,7 +316,10 @@ export const products: Product[] = [
     title: "Oatmeal shawl-collar cardigan",
     label: "Unbranded",
     era: "1980s",
-    size: "L",
+    sizes: [
+      { label: "M", available: false },
+      { label: "L", available: true },
+    ],
     measurements: { chest: 60, length: 70, shoulder: 50, sleeve: 62 },
     fabric: "Wool blend. Leather buttons.",
     condition: "C",
@@ -313,7 +337,7 @@ export const products: Product[] = [
     title: "Camel polo coat",
     label: "Ashby Tailors",
     era: "1980s",
-    size: "42",
+    sizes: [{ label: "42", available: true }],
     measurements: { chest: 60, length: 110, shoulder: 48, sleeve: 65 },
     fabric: "Wool and camel hair, half lined",
     condition: "B",
@@ -331,7 +355,7 @@ export const products: Product[] = [
     title: "Brown corduroy trousers",
     label: "Corvin",
     era: "1970s",
-    size: "W32 L31",
+    sizes: [{ label: "W32 L31", available: true }],
     measurements: { waist: 41, inseam: 79, length: 107 },
     fabric: "100% cotton corduroy, 8-wale",
     condition: "B",
@@ -349,7 +373,7 @@ export const products: Product[] = [
     title: "Striped oxford shirt",
     label: "Unbranded",
     era: "1990s",
-    size: "15½",
+    sizes: [{ label: "15½", available: true }],
     measurements: { chest: 56, length: 78, shoulder: 47, sleeve: 63 },
     fabric: "100% cotton oxford cloth",
     condition: "A",
@@ -367,7 +391,7 @@ export const products: Product[] = [
     title: "Navy double-breasted blazer",
     label: "Ashby Tailors",
     era: "1980s",
-    size: "40R",
+    sizes: [{ label: "40R", available: true }],
     measurements: { chest: 54, length: 76, shoulder: 45, sleeve: 63 },
     fabric: "100% wool serge, full canvas, gilt buttons",
     condition: "B",
@@ -385,7 +409,7 @@ export const products: Product[] = [
     title: "Grey flannel pleated trousers",
     label: "Ashby Tailors",
     era: "1990s",
-    size: "W34",
+    sizes: [{ label: "W34", available: true }],
     measurements: { waist: 43, inseam: 78, length: 108 },
     fabric: "100% wool flannel. Button fly.",
     condition: "B",
@@ -403,7 +427,7 @@ export const products: Product[] = [
     title: "Fair Isle crew-neck",
     label: "Unbranded",
     era: "1980s",
-    size: "M",
+    sizes: [{ label: "M", available: true }],
     measurements: { chest: 52, length: 64, shoulder: 45, sleeve: 59 },
     fabric: "100% Shetland wool",
     condition: "B",
@@ -421,7 +445,7 @@ export const products: Product[] = [
     title: "Herringbone tweed sports jacket",
     label: "Unbranded",
     era: "1970s",
-    size: "42L",
+    sizes: [{ label: "42L", available: true }],
     measurements: { chest: 57, length: 80, shoulder: 47, sleeve: 66 },
     fabric: "100% wool tweed. Leather elbow patches.",
     condition: "B",
@@ -439,7 +463,7 @@ export const products: Product[] = [
     title: "Cream linen camp-collar shirt",
     label: "Corvin",
     era: "1990s",
-    size: "L",
+    sizes: [{ label: "L", available: true }],
     measurements: { chest: 59, length: 74, shoulder: 49, sleeve: 26 },
     fabric: "100% linen",
     condition: "A",
@@ -457,7 +481,7 @@ export const products: Product[] = [
     title: "Waxed cotton field jacket",
     label: "Unbranded",
     era: "1990s",
-    size: "XL",
+    sizes: [{ label: "XL", available: true }],
     measurements: { chest: 63, length: 76, shoulder: 52, sleeve: 66 },
     fabric: "Waxed cotton, corduroy collar, tartan lining",
     condition: "C",
@@ -475,7 +499,7 @@ export const products: Product[] = [
     title: "Bridle leather belt",
     label: "Corvin",
     era: "1990s",
-    size: "34",
+    sizes: [{ label: "34", available: true }],
     measurements: { length: 98, width: 3 },
     fabric: "Bridle leather, solid brass buckle",
     condition: "B",

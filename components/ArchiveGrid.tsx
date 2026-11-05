@@ -25,7 +25,7 @@ export function ArchiveGrid({ products }: { products: Product[] }) {
               type="button"
               aria-pressed={section === o.value}
               onClick={() => setSection(o.value)}
-              className="type-label link py-1"
+              className="type-label link btn-text py-1"
             >
               {o.label}
             </button>

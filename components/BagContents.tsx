@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { holdWindow, SHIPPING_FEE } from "@/config/site";
-import { bagMessage, whatsappUrl, type Customer } from "@/lib/bagMessage";
-import { formatPrice, pieces, productHref } from "@/lib/catalog";
+import { bagMessage, whatsappUrl, type BagLine, type Customer } from "@/lib/bagMessage";
+import { formatPrice, pieces, productHref, statusOf } from "@/lib/catalog";
 import { useBag } from "./BagProvider";
 import { ProductImage } from "./ProductImage";
 
 const EMPTY: Customer = { name: "", phone: "", address: "", city: "", pincode: "", note: "" };
+
+/** A size that has gone since it was added is sold, whatever the rest of the product is doing. */
+const lineStatus = ({ product, size }: BagLine) => (size.available ? statusOf(product) : "sold");
 
 export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
   const { items, remove } = useBag();
@@ -19,9 +22,9 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
   const uid = useId();
 
   // A piece can sell or go on hold after it was added. It stays visible, but it can't be requested.
-  const open = items.filter((p) => p.status === "available");
-  const subtotal = open.reduce((sum, p) => sum + p.price, 0);
-  const bagKey = open.map((p) => p.code).join("|");
+  const open = items.filter((l) => lineStatus(l) === "available");
+  const subtotal = open.reduce((sum, l) => sum + l.product.price, 0);
+  const bagKey = open.map((l) => `${l.product.code}:${l.size.label}`).join("|");
   const confirmed = sent !== null && sent.bag === bagKey && open.length > 0;
 
   // The button that had focus is gone, so keyboard and screen reader users are moved to the message.
@@ -55,6 +58,17 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
             {holdWindow} once we confirm.
           </p>
         </div>
+        <ul className="mt-8 max-w-[30rem] border-t border-line">
+          {open.map(({ product: p, size }) => (
+            <li
+              key={`${p.code}:${size.label}`}
+              className="flex items-baseline justify-between gap-4 border-b border-line py-2.5"
+            >
+              <span className="type-label">{p.title}</span>
+              <span className="type-data shrink-0">SIZE {size.label}</span>
+            </li>
+          ))}
+        </ul>
         <p className="type-label mt-8 flex flex-col items-start gap-3">
           <a href={sent.url} target="_blank" rel="noopener noreferrer" className="link-on">
             WhatsApp didn&apos;t open? Try again →
@@ -111,10 +125,15 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div>
       <ul>
-        {items.map((p) => {
-          const unavailable = p.status !== "available";
+        {items.map((line) => {
+          const { product: p, size } = line;
+          const status = lineStatus(line);
+          const unavailable = status !== "available";
           return (
-            <li key={p.code} className="grid grid-cols-[5.5rem_1fr] gap-3 border-b border-line p-(--gutter)">
+            <li
+              key={`${p.code}:${size.label}`}
+              className="grid grid-cols-[5.5rem_1fr] gap-3 border-b border-line p-(--gutter)"
+            >
               <Link
                 href={productHref(p)}
                 onClick={onNavigate}
@@ -128,7 +147,7 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
                   index={0}
                   alt=""
                   sizes="88px"
-                  dim={p.status === "sold"}
+                  dim={status === "sold"}
                 />
               </Link>
               <div className="flex min-w-0 flex-col gap-1">
@@ -138,21 +157,21 @@ export function BagContents({ onNavigate }: { onNavigate?: () => void }) {
                     {p.title}
                   </Link>
                 </h3>
-                <p className="type-data">SIZE {p.size}</p>
+                <p className="type-data">SIZE {size.label}</p>
                 <p className={`type-data ${unavailable ? "line-through" : ""}`}>
                   {formatPrice(p.price)}
                 </p>
-                {p.status === "sold" ? (
+                {status === "sold" ? (
                   <p className="type-data">SOLD. NOT PART OF YOUR REQUEST.</p>
                 ) : null}
-                {p.status === "on-hold" ? (
+                {status === "on-hold" ? (
                   <p className="type-data">ON HOLD. NOT PART OF YOUR REQUEST.</p>
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => remove(p.code)}
-                  aria-label={`Remove ${p.title}`}
-                  className="type-label link mt-auto w-fit pt-2"
+                  onClick={() => remove(p.code, size.label)}
+                  aria-label={`Remove ${p.title}, size ${size.label}`}
+                  className="type-label link btn-text mt-auto w-fit pt-2"
                 >
                   Remove
                 </button>

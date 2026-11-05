@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
-import type { Condition, Product, Section } from "@/data/products";
-import { categories, conditionMeaning, pieces, sortNewest } from "@/lib/catalog";
+import type { Condition, Product } from "@/data/products";
+import { conditionMeaning, pieces, sortNewest, statusOf } from "@/lib/catalog";
+import { ChevronIcon, SliderIcon } from "./Icons";
 import { ProductGrid } from "./ProductCard";
 import { Sheet, SheetBar } from "./Sheet";
 
@@ -22,15 +22,13 @@ const list = (params: URLSearchParams, key: string) =>
 const unique = (values: string[]) => [...new Set(values)];
 
 function ListingView({
-  section,
+  title,
   products,
-  activeSlug,
   params,
   setParams,
 }: {
-  section: Section;
+  title: string;
   products: Product[];
-  activeSlug?: string;
   params: URLSearchParams;
   setParams: (next: URLSearchParams) => void;
 }) {
@@ -47,7 +45,7 @@ function ListingView({
 
   const facets = useMemo(
     () => ({
-      sizes: unique(products.map((p) => p.size)).sort((a, b) =>
+      sizes: unique(products.flatMap((p) => p.sizes.map((s) => s.label))).sort((a, b) =>
         a.localeCompare(b, undefined, { numeric: true }),
       ),
       eras: unique(products.map((p) => p.era)).sort(),
@@ -60,12 +58,12 @@ function ListingView({
     const hi = max === "" ? Infinity : Number(max);
     const filtered = products.filter(
       (p) =>
-        (sizes.length === 0 || sizes.includes(p.size)) &&
+        (sizes.length === 0 || p.sizes.some((s) => s.available && sizes.includes(s.label))) &&
         (eras.length === 0 || eras.includes(p.era)) &&
         (conditions.length === 0 || conditions.includes(p.condition)) &&
         p.price >= lo &&
         p.price <= hi &&
-        !(hideSold && p.status === "sold"),
+        !(hideSold && statusOf(p) === "sold"),
     );
     if (sort === "low") return [...filtered].sort((a, b) => a.price - b.price);
     if (sort === "high") return [...filtered].sort((a, b) => b.price - a.price);
@@ -101,55 +99,35 @@ function ListingView({
   const activeCount =
     sizes.length + eras.length + conditions.length + (min ? 1 : 0) + (max ? 1 : 0) + (hideSold ? 1 : 0);
 
-  const query = params.toString();
-  const withQuery = (href: string) => (query ? `${href}?${query}` : href);
-
-  const categoryLinks = [
-    { href: `/${section}`, label: "All", active: !activeSlug },
-    ...categories[section].map((c) => ({
-      href: `/${section}/${c.slug}`,
-      label: c.name,
-      active: c.slug === activeSlug,
-    })),
-  ];
-
   return (
     <>
-      <div className="flex flex-col gap-3 border-b border-ink px-(--gutter) py-3 md:flex-row md:items-baseline md:justify-between">
-        <nav aria-label="Categories" className="flex flex-wrap gap-x-4 gap-y-1">
-          {categoryLinks.map((c) => (
-            <Link
-              key={c.href}
-              href={withQuery(c.href)}
-              aria-current={c.active ? "page" : undefined}
-              className="type-label link py-1"
-            >
-              {c.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex shrink-0 items-baseline justify-between gap-5 md:justify-end">
-          <p role="status" className="type-data">
-            {pieces(shown.length)}
-          </p>
-          <div className="flex items-baseline gap-5">
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              onClick={() => setFilterOpen(true)}
-              className="type-label link py-1"
-            >
-              Filter{activeCount ? ` (${activeCount})` : ""}
-            </button>
-            <button
-              type="button"
-              aria-expanded={sortOpen}
-              onClick={() => setSortOpen((o) => !o)}
-              className="type-label link py-1"
-            >
-              Sort {sortOpen ? "−" : "+"}
-            </button>
-          </div>
+      <h1 className="px-(--gutter) py-12 text-center text-[22px] leading-[1.15] font-bold tracking-[0.02em] text-balance uppercase [font-stretch:80%] md:py-22 md:text-[28px]">
+        {title}
+      </h1>
+
+      <div className="flex items-center justify-between gap-4 px-(--gutter) py-3">
+        <p role="status" className="text-[14px] leading-[1.35] md:text-[16px]">
+          {pieces(shown.length).toLowerCase()}
+        </p>
+        <div className="flex shrink-0 items-center gap-5 md:gap-7">
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            onClick={() => setFilterOpen(true)}
+            className="type-nav link btn-text inline-flex! items-center gap-2 py-1"
+          >
+            <SliderIcon />
+            Filter{activeCount ? ` (${activeCount})` : ""}
+          </button>
+          <button
+            type="button"
+            aria-expanded={sortOpen}
+            onClick={() => setSortOpen((o) => !o)}
+            className="type-nav link btn-text inline-flex! items-center gap-2 py-1"
+          >
+            Sort by
+            <ChevronIcon className={`transition-transform duration-300 ${sortOpen ? "rotate-180" : ""}`} />
+          </button>
         </div>
       </div>
 
@@ -161,7 +139,7 @@ function ListingView({
               type="button"
               aria-pressed={sort === s.value}
               onClick={() => setValue("sort", s.value === "newest" ? "" : s.value)}
-              className="type-label link py-1"
+              className="type-label link btn-text py-1"
             >
               {s.label}
             </button>
@@ -188,24 +166,6 @@ function ListingView({
       <Sheet open={filterOpen} onClose={() => setFilterOpen(false)} label="Filter">
         <SheetBar title="Filter" onClose={() => setFilterOpen(false)} />
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="border-b border-line p-(--gutter)">
-            <p className="type-label mb-3 text-muted">Category</p>
-            <ul className="flex flex-col gap-1.5">
-              {categoryLinks.map((c) => (
-                <li key={c.href}>
-                  <Link
-                    href={withQuery(c.href)}
-                    aria-current={c.active ? "page" : undefined}
-                    onClick={() => setFilterOpen(false)}
-                    className="type-label link"
-                  >
-                    {c.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <CheckGroup
             legend="Size"
             options={facets.sizes.map((s) => ({ value: s, label: s }))}
@@ -280,7 +240,7 @@ function ListingView({
         </div>
 
         <div className="flex shrink-0 items-center gap-5 border-t border-ink p-(--gutter)">
-          <button type="button" onClick={clear} className="type-label link shrink-0 py-2">
+          <button type="button" onClick={clear} className="type-label link btn-text shrink-0 py-2">
             Clear
           </button>
           <button type="button" onClick={() => setFilterOpen(false)} className="btn">
@@ -325,7 +285,7 @@ function CheckGroup({
   );
 }
 
-type Props = { section: Section; products: Product[]; activeSlug?: string };
+type Props = { title: string; products: Product[] };
 
 /** Filter state lives in the URL, so it survives category changes and can be shared. */
 function ListingWithParams(props: Props) {

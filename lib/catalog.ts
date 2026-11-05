@@ -1,38 +1,32 @@
-import { products, type Condition, type Product, type Section } from "@/data/products";
+import { products, type Condition, type Product, type Section, type Status } from "@/data/products";
 import { site } from "@/config/site";
 
 export type Category = {
   name: string;
   slug: string;
-  /** Roman line + italic line for the reference-1 lockup. */
-  lockup: [string, string];
 };
 
 export const toSlug = (name: string) =>
   name.toLowerCase().replace(/&/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
 
-const cat = (name: string, lockup: [string, string]): Category => ({
-  name,
-  slug: toSlug(name),
-  lockup,
-});
+const cat = (name: string): Category => ({ name, slug: toSlug(name) });
 
 export const categories: Record<Section, Category[]> = {
   women: [
-    cat("Dresses", ["The", "Dresses"]),
-    cat("Knitwear", ["The", "Knitwear"]),
-    cat("Coats & Jackets", ["Coats &", "Jackets"]),
-    cat("Shirts & Blouses", ["Shirts &", "Blouses"]),
-    cat("Skirts & Trousers", ["Skirts &", "Trousers"]),
-    cat("Bags & Scarves", ["Bags &", "Scarves"]),
+    cat("Dresses"),
+    cat("Knitwear"),
+    cat("Coats & Jackets"),
+    cat("Shirts & Blouses"),
+    cat("Skirts & Trousers"),
+    cat("Bags & Scarves"),
   ],
   men: [
-    cat("Shirts", ["The", "Shirts"]),
-    cat("Knitwear", ["The", "Knitwear"]),
-    cat("Coats & Jackets", ["Coats &", "Jackets"]),
-    cat("Tailoring", ["The", "Tailoring"]),
-    cat("Trousers", ["The", "Trousers"]),
-    cat("Accessories", ["The", "Accessories"]),
+    cat("Shirts"),
+    cat("Knitwear"),
+    cat("Coats & Jackets"),
+    cat("Tailoring"),
+    cat("Trousers"),
+    cat("Accessories"),
   ],
 };
 
@@ -70,14 +64,18 @@ export const findProduct = (code: string) => products.find((p) => p.code === cod
 
 export const productHref = (p: Pick<Product, "section" | "code">) => `/${p.section}/${p.code}`;
 
-export const soldPieces = () => sortNewest(products.filter((p) => p.status === "sold"));
+/** A product's real status: with no size left to buy, it counts as sold. */
+export const statusOf = (p: Pick<Product, "status" | "sizes">): Status =>
+  p.sizes.some((s) => s.available) ? p.status : "sold";
+
+export const soldPieces = () => sortNewest(products.filter((p) => statusOf(p) === "sold"));
 
 export const latestDropPieces = (limit = 8) =>
   sortNewest(products.filter((p) => p.drop === currentDrop)).slice(0, limit);
 
 export const moreFromDrop = (p: Product, limit = 8) =>
   sortNewest(
-    products.filter((o) => o.drop === p.drop && o.code !== p.code && o.status !== "sold"),
+    products.filter((o) => o.drop === p.drop && o.code !== p.code && statusOf(o) !== "sold"),
   ).slice(0, limit);
 
 /** Date a drop went out, taken from its pieces. */

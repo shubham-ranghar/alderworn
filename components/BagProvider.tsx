@@ -10,17 +10,21 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Product } from "@/data/products";
+import type { BagLine } from "@/lib/bagMessage";
 import { findProduct } from "@/lib/catalog";
 
-const KEY = "alderworn.bag.v1";
+const KEY = "alderworn.bag.v2";
+/** Bags saved before sizes: a plain list of product codes. */
+const OLD_KEY = "alderworn.bag.v1";
+
+type Saved = { code: string; size: string };
 
 type BagContextValue = {
-  items: Product[];
+  items: BagLine[];
   count: number;
-  has: (code: string) => boolean;
-  add: (code: string) => void;
-  remove: (code: string) => void;
+  has: (code: string, size: string) => boolean;
+  add: (code: string, size: string) => void;
+  remove: (code: string, size: string) => void;
   drawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -28,33 +32,49 @@ type BagContextValue = {
 
 const BagContext = createContext<BagContextValue | null>(null);
 
-const read = (): string[] => {
+const isSaved = (l: unknown): l is Saved =>
+  typeof (l as Saved)?.code === "string" && typeof (l as Saved)?.size === "string";
+
+const parse = (key: string): unknown[] => {
   try {
-    const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    return Array.isArray(parsed) ? parsed.filter((c) => typeof c === "string") : [];
+    const parsed = JSON.parse(localStorage.getItem(key) ?? "[]");
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 };
 
-const write = (codes: string[]) => {
+const read = (): Saved[] => {
+  const saved = parse(KEY).filter(isSaved);
+  if (saved.length > 0) return saved;
+  // An old bag only says which product, so it can only carry over if that product has one size.
+  return parse(OLD_KEY).flatMap((code) => {
+    const sizes = typeof code === "string" ? (findProduct(code)?.sizes ?? []) : [];
+    return sizes.length === 1 ? [{ code: code as string, size: sizes[0].label }] : [];
+  });
+};
+
+const write = (lines: Saved[]) => {
   try {
-    localStorage.setItem(KEY, JSON.stringify(codes));
+    localStorage.setItem(KEY, JSON.stringify(lines));
+    localStorage.removeItem(OLD_KEY);
   } catch {
     /* Private window: the bag still works until the tab closes. */
   }
 };
 
+const same = (l: Saved, code: string, size: string) => l.code === code && l.size === size;
+
 export function BagProvider({ children }: { children: ReactNode }) {
-  const [codes, setCodes] = useState<string[]>([]);
+  const [lines, setLines] = useState<Saved[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
 
   // localStorage only exists after hydration, and other tabs can change it.
   useEffect(() => {
-    setCodes(read());
+    setLines(read());
     const onStorage = (e: StorageEvent) => {
-      if (e.key === KEY) setCodes(read());
+      if (e.key === KEY) setLines(read());
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -62,8 +82,8 @@ export function BagProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => setDrawerOpen(false), [pathname]);
 
-  const update = useCallback((next: (prev: string[]) => string[]) => {
-    setCodes((prev) => {
+  const update = useCallback((next: (prev: Saved[]) => Saved[]) => {
+    setLines((prev) => {
       const value = next(prev);
       write(value);
       return value;
@@ -71,19 +91,24 @@ export function BagProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<BagContextValue>(() => {
-    const items = codes.flatMap((c) => findProduct(c) ?? []);
+    const items = lines.flatMap((l) => {
+      const product = findProduct(l.code);
+      const size = product?.sizes.find((s) => s.label === l.size);
+      return product && size ? [{ product, size }] : [];
+    });
     return {
       items,
       count: items.length,
-      has: (code) => codes.includes(code),
-      // One of one: a piece can only be in the bag once.
-      add: (code) => update((prev) => (prev.includes(code) ? prev : [...prev, code])),
-      remove: (code) => update((prev) => prev.filter((c) => c !== code)),
+      has: (code, size) => lines.some((l) => same(l, code, size)),
+      // Each size of a product can only be in the bag once.
+      add: (code, size) =>
+        update((prev) => (prev.some((l) => same(l, code, size)) ? prev : [...prev, { code, size }])),
+      remove: (code, size) => update((prev) => prev.filter((l) => !same(l, code, size))),
       drawerOpen,
       openDrawer: () => setDrawerOpen(true),
       closeDrawer: () => setDrawerOpen(false),
     };
-  }, [codes, drawerOpen, update]);
+  }, [lines, drawerOpen, update]);
 
   return <BagContext.Provider value={value}>{children}</BagContext.Provider>;
 }

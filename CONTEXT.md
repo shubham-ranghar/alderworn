@@ -39,7 +39,7 @@ second customer can request a piece until that deploy finishes.
 | `scripts/flatten-export.mjs` | Post-build fix for a Next.js export bug on Windows. Does nothing on Linux |
 
 Pages: home, `/women`, `/men`, category and product pages under each section, `/bag`, `/archive`,
-`/about`, `/info`, a search overlay, the 404 page, and `/styleguide` (not linked).
+`/info`, the 404 page, and `/styleguide` (not linked). Search lives in the header.
 
 ## Current settings
 
@@ -54,6 +54,7 @@ Pages: home, `/women`, `/men`, category and product pages under each section, `/
 | `instagramUrl` | `https://instagram.com/alderworn` | Placeholder |
 | `url` | `https://alderworn.example` | Placeholder |
 | `UPI_ID` | `yourname@bank` | Placeholder, not shown on the site |
+| `dropListAccessKey` | empty | Placeholder. The drop list form shows an error until it is set |
 
 ## Before going live
 
@@ -61,10 +62,9 @@ Pages: home, `/women`, `/men`, category and product pages under each section, `/
       and they use flat colour panels because there are no real photos yet. With the real WhatsApp number
       set, customers could send requests for them.
 - [ ] Set the placeholder values listed above.
-- [ ] Review the drafted copy in `app/info/page.tsx` (courier, paper packaging, FAQ) and the brand story
-      in `app/about/page.tsx`.
-- [ ] Connect the footer drop list to a mailing service if it should collect addresses. It only shows a
-      confirmation message today.
+- [ ] Review the drafted copy in `app/info/page.tsx` (courier, paper packaging, FAQ).
+- [ ] Set `dropListAccessKey` and test a footer drop list signup from the live site. Web3Forms emails each
+      signup to the owner. There is no mailing list, so drop messages are sent by hand.
 - [ ] Deploy on Cloudflare Pages, then check the browser console for 404s.
 - [ ] Send a real test order from another phone.
 - [ ] Confirm that Cloudflare's free plan terms allow commercial use.

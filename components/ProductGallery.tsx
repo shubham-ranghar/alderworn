@@ -2,11 +2,13 @@
 
 import { useRef, useState } from "react";
 import type { Product } from "@/data/products";
+import { statusOf } from "@/lib/catalog";
 import { ProductImage } from "./ProductImage";
 
 /** Stacked at full width on desktop. Swipeable with a counter on mobile. */
 export function ProductGallery({ product }: { product: Product }) {
-  const { images, code, title, status } = product;
+  const { images, code, title } = product;
+  const status = statusOf(product);
   const [index, setIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 

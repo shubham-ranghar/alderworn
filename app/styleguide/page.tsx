@@ -126,7 +126,7 @@ export default function StyleguidePage() {
         labels={{
           tl: "Style",
           tc: "Pairing no. 2",
-          tr: <Seal className="h-[clamp(4.5rem,9vw,8rem)] w-[clamp(4.5rem,9vw,8rem)]" />,
+          tr: <Seal />,
           bl: "Heavy",
           bc: <span className="type-label">Kalnia 700</span>,
           br: "Roman",
@@ -257,8 +257,8 @@ export default function StyleguidePage() {
 
       <Heading n="06">Marks and lockups</Heading>
       <div className="flex flex-wrap items-end gap-12 px-(--gutter)">
-        <Seal className="h-48 w-48" />
-        <Seal className="h-24 w-24" />
+        <Seal />
+        <Seal />
         <Wordmark className="text-3xl" />
         <StackLockup roman="Previously" italic="owned." caption="Est. 2026" as="p" />
       </div>

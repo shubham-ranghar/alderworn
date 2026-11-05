@@ -10,7 +10,11 @@
   --seal: #8f7a63;
 
   --header-h: 3.5rem;
+  --search-h: 3.5rem;
+  --category-h: 3.375rem;
   --gutter: 1rem;
+
+  --hover-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (min-width: 768px) {
@@ -137,6 +141,16 @@
   text-transform: uppercase;
 }
 
+/* Header rows and the listing's controls. */
+@utility type-nav {
+  font-family: var(--font-archivo-face), sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
 @utility type-data {
   font-family: var(--font-archivo-face), sans-serif;
   font-size: 12px;
@@ -166,7 +180,7 @@
 /* Mega without the 5rem floor, for words too long to fit a phone at mega. */
 @utility type-mega-fit {
   font-family: var(--font-kalnia-face), serif;
-  font-size: min(15rem, var(--fit, 16vw));
+  font-size: min(var(--fit-max, 15rem), var(--fit, 16vw));
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 0.88;
@@ -205,15 +219,46 @@
 
 /* ------------------------------ Links ----------------------------- */
 
-@utility link {
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+/* Layered so utilities like `hidden` and `md:block` still win over the display here. */
+@layer components {
+  .link,
+  .link-reveal {
+    position: relative;
+    display: inline-block;
+  }
+}
 
-  &:hover,
-  &[aria-current="page"],
-  &[aria-current="true"],
-  &[aria-pressed="true"] {
-    text-decoration-line: underline;
+/*
+ * The underline grows from the left. Inheriting the padding keeps the line against
+ * the text however much padding the link has: only the content box is painted.
+ * .link reacts to its own hover, .link-reveal to the hover of a parent .group.
+ */
+.link::after,
+.link-reveal::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: var(--link-offset, 0px);
+  left: 0;
+  box-sizing: content-box;
+  height: var(--link-thickness, 1px);
+  padding-bottom: inherit;
+  background: currentColor;
+  background-clip: content-box;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms var(--hover-ease);
+}
+
+.link:is([aria-current="page"], [aria-current="true"], [aria-pressed="true"])::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .link:not(.btn-text):hover::after,
+  .group:hover .link-reveal::after {
+    transform: scaleX(1);
   }
 }
 
@@ -253,6 +298,49 @@
   background: transparent;
   color: var(--muted);
   border-color: var(--line);
+}
+
+.btn,
+.btn-text {
+  transition:
+    background-color 250ms var(--hover-ease),
+    color 250ms var(--hover-ease);
+}
+
+/* Text-only buttons. The fill sits outside the text so it never moves the layout. */
+.btn-text {
+  isolation: isolate;
+}
+
+.btn-text::before {
+  content: "";
+  position: absolute;
+  inset: 0 -0.375rem;
+  z-index: -1;
+  background: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms var(--hover-ease);
+}
+
+@media (hover: hover) {
+  .btn:not(.btn-quiet, .btn-off, :disabled, [aria-disabled="true"]):hover {
+    background-color: transparent;
+    color: var(--ink);
+  }
+
+  .btn.btn-quiet:not(.btn-off, :disabled, [aria-disabled="true"]):hover {
+    background-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn-text:hover {
+    color: var(--paper);
+  }
+
+  .btn-text:hover::before {
+    opacity: 1;
+  }
 }
 
 /* ------------------------------ Fields ---------------------------- */
@@ -360,6 +448,98 @@ details[open] > summary .when-closed {
   display: none;
 }
 
+/* ------------------------------ Cards ----------------------------- */
+
+.card-info,
+.card-sizes {
+  transition: opacity 300ms var(--hover-ease);
+}
+
+/* Hover devices: the first photo only; sizes appear on hover. */
+@media (hover: hover) {
+  .card-photo {
+    position: absolute;
+    inset: 0;
+  }
+
+  .card-photo:not(:first-child),
+  .card-dots {
+    display: none;
+  }
+
+  .card-sizes {
+    opacity: 0;
+  }
+
+  .card:hover .card-sizes,
+  .card:has(:focus-visible) .card-sizes {
+    opacity: 1;
+  }
+
+  .card:hover .card-info[data-swap],
+  .card:has(:focus-visible) .card-info[data-swap] {
+    opacity: 0;
+  }
+}
+
+/* Scales the whole tile: a transform on the photo alone would cut its multiply off from the tile. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card-photo {
+    transition: transform 900ms var(--hover-ease);
+  }
+
+  .card:hover .card-photo,
+  .card:has(:focus-visible) .card-photo {
+    transform: scale(1.03);
+  }
+}
+
+/* Touch: photos sit side by side and swipe; dots, title and price always show. */
+@media (hover: none) {
+  .card-photos {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .card-photos::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-photo {
+    position: relative;
+    flex: none;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+
+  .card-sizes {
+    display: none;
+  }
+}
+
+/* Only defined when motion is welcome: the reduce rule below would otherwise
+   shorten this endless spin to 0.01ms a turn instead of stopping it. */
+@media (prefers-reduced-motion: no-preference) {
+  .seal-ring {
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    animation: seal-spin 40s linear infinite;
+  }
+
+  svg:hover > .seal-ring {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -367,5 +547,33 @@ details[open] > summary .when-closed {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Hovers keep a plain short fade, with no movement. */
+  .card-info,
+  .card-sizes,
+  .btn,
+  .btn-text,
+  .btn-text::before {
+    transition-duration: 150ms !important;
+  }
+
+  .link::after,
+  .link-reveal::after {
+    opacity: 0;
+    transform: none;
+    transition: opacity 150ms var(--hover-ease);
+    transition-duration: 150ms !important;
+  }
+
+  .link:is([aria-current="page"], [aria-current="true"], [aria-pressed="true"])::after {
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .link:not(.btn-text):hover::after,
+    .group:hover .link-reveal::after {
+      opacity: 1;
+    }
   }
 }
