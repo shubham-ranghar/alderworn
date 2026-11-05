@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Band } from "@/components/Band";
-import { DropList } from "@/components/DropList";
 import { ScriptLockup, StackLockup } from "@/components/Lockups";
 import { ProductRow } from "@/components/ProductCard";
 import { Seal } from "@/components/Seal";
@@ -163,17 +162,6 @@ export default function HomePage() {
             </li>
           ))}
         </ol>
-      </section>
-
-      {/* Drop list */}
-      <section className="grid px-(--gutter) pt-20 md:grid-cols-12 md:pt-32">
-        <StackLockup
-          roman="The drop"
-          italic="list"
-          align="left"
-          className="mb-8 md:col-span-3 md:col-start-2 md:mb-0"
-        />
-        <DropList className="md:col-span-5 md:col-start-8" />
       </section>
     </>
   );
