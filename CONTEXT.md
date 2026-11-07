@@ -41,6 +41,48 @@ second customer can request a piece until that deploy finishes.
 Pages: home, `/women`, `/men`, category and product pages under each section, `/bag`, `/archive`,
 `/info`, the 404 page, and `/styleguide` (not linked). Search lives in the header.
 
+## Home hero
+
+A solid ink section in `app/page.tsx`, with its styles under "Hero" in `app/globals.css`. It has its own
+markup rather than using `Band`, because the phone layout reorders the labels.
+
+- "ALDERWORN" in `type-mega` (`clamp(4rem, 20vw, 22rem)`, paper colour) scrolls right to left in an
+  endless loop. The track holds four copies and moves by -50% every 28 seconds, so it never shows a gap
+  even on very wide screens. With reduced motion it stays still.
+- The photo (`homeImages.hero`) sits centred in front of the text and starts halfway down the letters, so
+  the name slides behind it.
+- The page's only h1 is visually hidden: "ALDERWORN — Previously owned." The marquee copies are
+  `aria-hidden`.
+- The fixed seal takes a paper disc on the home page (`<Seal disc />`) so it shows over the dark hero.
+
+**640px and up** (tablet, desktop, phone landscape): the hero fills the screen below the header and search
+rows. The photo is a 4:5 portrait, `min(30vw, 560px)` wide, cropped with `object-position: 81%` so the model
+is centred. It may run past the hero's bottom edge, which cuts it off. The drop label is top left, the
+tagline "One of each. Never restocked." bottom left (`type-lead`, paper, no tab), and "Women / Men" bottom
+right.
+
+**Below 640px:** a plain stack, as tall as its content.
+
+- The order is "Drop 004", then the marquee about 40px below it, then the photo, then one row with the
+  tagline on the left and "Women / Men" on the right. Neither crosses the photo.
+- The photo is 4:5. Its width is the smallest of 70vw, 58svh tall, and the height the other rows leave.
+  The whole hero therefore fits on the first screen, down to 320×568.
+- The seal shrinks to 64px so it clears the search text.
+
+## Drop list popup
+
+`components/DropListPopup.tsx` is mounted in `app/layout.tsx` and uses the `popup` variant of `Sheet`.
+It sends signups through the footer form's `sendSignup` and `dropListAccessKey`, so it shows its error
+message until the key is set. Its copy lives in `site.dropListPopup`, and its photo is `homeImages.hero`.
+
+- It appears only on `/`, `/women` and `/men` (exact paths), after 8 seconds or 40% scroll, whichever
+  comes first. It waits while any dialog is open (menu, bag, filter) or the search field has focus.
+- It shows once per visit (sessionStorage). Closing it snoozes it for 14 days and joining hides it for
+  good (localStorage keys `alderworn:droplist-popup-*`). Storage is read only after hydration.
+- Add `?popup=1` to any URL to open it at once, ignoring those rules.
+- Below 768px it is a single column without the photo, 16px from the screen edges, scrolling within
+  90svh.
+
 ## Current settings
 
 | Setting | Value | State |
@@ -58,6 +100,8 @@ Pages: home, `/women`, `/men`, category and product pages under each section, `/
 
 ## Before going live
 
+- [ ] Buy the PP Neue Montreal web license for Regular, Medium and Bold and replace the trial files before
+      deploying.
 - [ ] Replace the 11 sample products (2 women, 9 men). They are invented, including their brand labels,
       and they use flat colour panels because there are no real photos yet. With the real WhatsApp number
       set, customers could send requests for them.
@@ -90,15 +134,82 @@ on the live site.
 
 The test scripts were kept outside the repository, so they aren't available from a fresh clone.
 
+## Colour theme
+
+A cool neutral palette, defined as seven tokens in `app/globals.css`. The token names come from the earlier
+warm palette and were kept so no component classes had to change.
+
+| Token | Value | Role |
+| --- | --- | --- |
+| `paper` | `#ffffff` | Main background |
+| `cream` | `#f4f5f7` | Secondary panels |
+| `taupe` | `#e4e6ea` | Muted panels and fills |
+| `ink` | `#0d0d0d` | Text, borders, buttons |
+| `muted` | `#5f6368` | Secondary text, disabled states |
+| `line` | `rgba(13, 13, 13, 0.12)` | Dividers, dialog backdrop |
+| `seal` | `#1f2a44` | Deep navy accent for the rotating seal and the favicon |
+
+Muted text contrast: 6.05:1 on paper, 5.55:1 on cream, 4.84:1 on taupe, so all three pass WCAG AA.
+The favicon (`app/icon.svg`), the `themeColor` in `app/layout.tsx` and the `/styleguide` swatches use the
+same values.
+
+## Typography
+
+One font family, **PP Neue Montreal** (Pangram Pangram), in three weights: Regular 400, Medium 500 and
+Bold 700. No other fonts, weights or italics. It loads in `lib/fonts.ts` with `next/font/local` from
+`app/fonts/neue-montreal/` (`PPNeueMontreal-Regular.woff2`, `-Medium.woff2`, `-Bold.woff2`). These are
+**trial files, personal use only**: see "Before going live". CSS only refers to `--font-sans-face` (as
+Tailwind's `--font-sans`), and the type roles live in `app/globals.css`.
+
+Every piece of text uses one of these roles (`type-<role>`), and nothing else:
+
+| Role | Weight | Size (mobile → desktop) | Case | Letter-spacing | Line-height |
+| --- | --- | --- | --- | --- | --- |
+| logo | Bold 700 | 20 → 24px | upper | 0.08em | 1 |
+| mega | Regular 400 | `clamp(4rem, 20vw, 22rem)` | upper | -0.03em | 0.85 |
+| h1 | Regular 400 | `clamp(2.75rem, 7vw, 6rem)` | normal | -0.03em | 0.9 |
+| h2 | Regular 400 | `clamp(2rem, 4.5vw, 4rem)` | normal | -0.02em | 0.95 |
+| title | Regular 400 | 24 → 28px | normal | -0.01em | 1.1 |
+| lead | Regular 400 | 18 → 20px | normal | 0 | 1.4 |
+| body | Regular 400 | 15px | normal | 0 | 1.55 |
+| field | Regular 400 | 16px | normal | 0 | 1.4 |
+| label | Medium 500 | 12px | upper | 0.08em | 1.35 |
+| data | Regular 400 | 12px, tabular figures | upper | 0.04em | 1.35 |
+
+Buttons (`btn`) use label at line-height 1. The desktop step (logo, title, lead) is at 768px.
+
+Where they go:
+
+- **logo:** the header wordmark. **mega:** the hero marquee.
+- **h1:** page titles (`/women`, `/men`, categories, `/saved`, `/archive`, `/info`), the "How it works"
+  step numbers (seal colour) and the mobile menu links.
+- **h2:** section headings ("The latest / Drop 004", "How it works", "More from", the `/info` headings),
+  "Request sent." and the drop list popup headline.
+- **title:** product titles and every empty state. **lead:** the hero tagline and the `/archive` intro.
+- **label:** nav, the category bar, links, buttons, form labels and errors, corner labels, card titles.
+- **data:** prices, codes, sizes, counts, measurements.
+
+Rules:
+
+- Everything 24px and larger is Regular. Bold is only for the logo, the bag and checkout total amount, and
+  the SOLD / ON HOLD status labels (`font-bold`). Only `font-normal`, `font-medium` and `font-bold` exist.
+- Nothing is below 12px, except the seal's ring text (Medium, decorative).
+- Two-line headings (`StackLockup`) set both lines in the same style.
+- Four elements keep a size of their own on top of a role, set with `--type-size`: the mobile menu links
+  (h1 at `min(14.5vw, 13svh)`), the home Women / Men panels (mega at `clamp(3.5rem, 9vw, 9rem)`), the
+  footer's "Previously owned." (h2 at `clamp(3rem, 6.75vw, 6rem)`) and the 404 heading (h1 at
+  `min(15rem, 16vw)`). Everything else about them comes from the role.
+- `font-synthesis: none` is set on `html`, so the browser never fakes bold or italic.
+
 ## Decisions worth keeping
 
 - **No email orders.** The address appears only in the footer and the `/info` Contact section, for general
   questions.
-- **One drop list form per page.** The signup lives in the footer. The home page section was removed
-  because it appeared directly above the footer's.
+- **One inline drop list form per page.** The signup lives in the footer. The home page section was
+  removed because it appeared directly above the footer's. The popup on home, `/women` and `/men` is the
+  one exception, added on purpose.
 - **Orders & Returns** is the link label for `/info`, replacing "Information" for SEO. The page heading is
   still "Information".
-- **Mrs Saint Delafield** appears only on home, women, men and 404, plus `/styleguide` for reference.
 - **Design rules:** only the seven colour tokens, no gradients, shadows or rounded corners, and words
   instead of icons. The one permitted glyph is →.
 
@@ -107,7 +218,6 @@ The test scripts were kept outside the repository, so they aren't available from
 - Photos are served exactly as uploaded because there is no server to resize them. Aim for about 1600px
   and under 500 KB.
 - Photo filenames must be exact, such as `1.jpg`. The live site runs on Linux, where `1.JPG` won't match.
-- Kalnia has no swash letters, so the swashes in the original typography reference can't be reproduced.
 - Home panel text over photos needs a fix when real photos are added to `homeImages`. The dark text is
   hard to read over images. An earlier fix using `mix-blend-difference` was removed with the preview
   images.

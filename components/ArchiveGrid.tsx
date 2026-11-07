@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { Product, Section } from "@/data/products";
 import { pieces } from "@/lib/catalog";
@@ -14,6 +15,18 @@ const OPTIONS: { value: Section | "all"; label: string }[] = [
 export function ArchiveGrid({ products }: { products: Product[] }) {
   const [section, setSection] = useState<Section | "all">("all");
   const shown = section === "all" ? products : products.filter((p) => p.section === section);
+
+  // Nothing sold yet: no tabs or count, just the line and a way back to the shop.
+  if (products.length === 0) {
+    return (
+      <div className="px-(--gutter) py-20">
+        <p className="type-title">Nothing here yet. It won&apos;t last.</p>
+        <Link href="/#latest-drop" className="type-label link mt-2 py-3">
+          Shop the latest drop →
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -41,7 +54,9 @@ export function ArchiveGrid({ products }: { products: Product[] }) {
           <ProductGrid products={shown} />
         </div>
       ) : (
-        <p className="type-title px-(--gutter) py-20">Nothing here yet. It won&apos;t last.</p>
+        <p className="type-title px-(--gutter) py-20">
+          Nothing here yet. It won&apos;t last.
+        </p>
       )}
     </>
   );

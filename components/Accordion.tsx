@@ -11,11 +11,12 @@ export function Accordion({
 } & ComponentProps<"details">) {
   return (
     <details {...details} className={`border-b border-line ${className}`}>
-      <summary className="type-label flex items-center justify-between py-3">
+      <summary className="type-label flex items-center justify-between gap-4 py-3">
         {title}
-        <span aria-hidden="true">
-          <span className="when-closed">+</span>
-          <span className="when-open">−</span>
+        {/* Like the FAQ on /info. */}
+        <span aria-hidden="true" className="shrink-0">
+          <span className="when-closed">Open</span>
+          <span className="when-open">Close</span>
         </span>
       </summary>
       <div className="pb-5">{children}</div>

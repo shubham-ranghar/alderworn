@@ -37,12 +37,12 @@ function CategoryLinks({ section, slug, query = "" }: { section: Section; slug?:
   ];
 
   return (
-    // Every link carries the 1px border and 10px padding, so 6px between them leaves the words
-    // 28px apart, and the first word lines up with the gutter when it has no box.
+    // The words sit 28px apart. The active one carries the header's underline (.link with
+    // aria-current); the others grow it from the left on hover.
     <nav
       ref={bar}
       aria-label="Categories"
-      className="scroll-none relative flex h-(--category-h) items-center gap-1.5 overflow-x-auto border-b border-ink bg-paper px-[calc(var(--gutter)-11px)]"
+      className="scroll-none relative flex h-(--category-h) items-center gap-7 overflow-x-auto border-b border-ink bg-paper px-(--gutter)"
     >
       {links.map((l) => (
         <Link
@@ -50,7 +50,7 @@ function CategoryLinks({ section, slug, query = "" }: { section: Section; slug?:
           // Filters live in the URL, so they carry over to the next category.
           href={query ? `${l.href}?${query}` : l.href}
           aria-current={l.active ? "page" : undefined}
-          className={`type-nav shrink-0 border px-2.5 py-1.5 whitespace-nowrap transition-colors duration-300 ${l.active ? "border-ink" : "border-transparent hover:border-line"}`}
+          className="type-label link shrink-0 py-2 whitespace-nowrap"
         >
           {l.label}
         </Link>

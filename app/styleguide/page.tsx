@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Band } from "@/components/Band";
-import { ScriptLockup, StackLockup } from "@/components/Lockups";
+import { StackLockup } from "@/components/Lockups";
 import { ProductCard } from "@/components/ProductCard";
 import { Seal } from "@/components/Seal";
 import { Wordmark } from "@/components/Wordmark";
@@ -12,13 +11,13 @@ export const metadata: Metadata = {
 };
 
 const swatches = [
-  ["--paper", "#F4F1EC", "Main background"],
-  ["--cream", "#EFE8DE", "Hero bands"],
-  ["--taupe", "#D4CBBF", "One feature band per page"],
+  ["--paper", "#FFFFFF", "Main background"],
+  ["--cream", "#F4F5F7", "Hero bands"],
+  ["--taupe", "#E4E6EA", "One feature band per page"],
   ["--ink", "#0D0D0D", "Text, rules, buttons"],
-  ["--muted", "#6E6860", "Secondary text"],
-  ["--line", "rgba(13,13,13,.15)", "Subtle dividers"],
-  ["--seal", "#8F7A63", "The seal only"],
+  ["--muted", "#5F6368", "Secondary text"],
+  ["--line", "rgba(13,13,13,.12)", "Subtle dividers"],
+  ["--seal", "#1F2A44", "The seal only"],
 ];
 
 function Heading({ n, children }: { n: string; children: string }) {
@@ -44,167 +43,52 @@ export default function StyleguidePage() {
         <p className="type-label">Not linked. Not indexed.</p>
       </div>
 
-      {/* ------------------------- Reference 1 ------------------------- */}
-      <Heading n="R1">Reference 1: script over serif, stacked lockups</Heading>
-      <div className="relative overflow-hidden px-(--gutter)">
-        <p className="type-label absolute top-[9%] right-(--gutter) text-right">
-          Free
-          <br />
-          Font
-          <br />
-          Pairings
-        </p>
-        <div className="pt-[max(8rem,15vw)]">
-          <ScriptLockup
-            as="div"
-            script="Old"
-            word="Money"
-            wordClass="type-mega-fit"
-            scriptStyle={{ fontSize: "1.9em", top: "-0.76em", left: "0.12em", rotate: "-7deg" }}
-          />
-        </div>
-
-        <div className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-x-6 gap-y-14">
-          {/* roman serif over italic serif over tiny tracked sans */}
-          <div className="text-center">
-            <div className="font-bodoni text-[clamp(1.75rem,4vw,3.25rem)] leading-[0.92]">
-              <span className="block">The</span>
-              <span className="block italic">Seasons</span>
-            </div>
-            <p className="type-label mt-2 tracking-[0.3em]!">Fall edition</p>
-          </div>
-          {/* italic didone over roman capitals over small sans capitals */}
-          <div className="text-center">
-            <div className="font-bodoni text-[clamp(1.75rem,4vw,3.25rem)] leading-[0.92]">
-              <span className="block italic">Second</span>
-              <span className="block text-[0.72em] uppercase">Owners</span>
-            </div>
-            <p className="type-label mt-2">House of</p>
-          </div>
-          {/* tall condensed high-contrast capitals with a script across them */}
-          <div className="flex justify-center pt-4">
-            <div className="relative">
-              <span className="font-kalnia block text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.9] font-extralight tracking-[-0.02em] uppercase">
-                Worn
-              </span>
-              <span className="font-script absolute top-[-0.32em] left-[-0.1em] -rotate-6 text-[clamp(4rem,10vw,7.5rem)] leading-none">
-                twice
-              </span>
-            </div>
-          </div>
-          {/* thin capitals on two lines over a small sans caption */}
-          <div className="text-center">
-            <div className="font-kalnia text-[clamp(1.5rem,3.5vw,2.75rem)] leading-[0.95] font-extralight tracking-[-0.01em] uppercase">
-              <span className="block">One</span>
-              <span className="block">of each</span>
-            </div>
-            <p className="type-label mt-2">Never restocked</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ------------------------- Reference 2 ------------------------- */}
-      <Heading n="R2">Reference 2: three poster panels</Heading>
-      <Band
-        tone="cream"
-        className="min-h-[34vw]"
-        labels={{
-          tl: "Style",
-          tc: "Pairing no. 1",
-          tr: "2026",
-          bl: "Heavy",
-          bc: <span className="type-label">Kalnia 700</span>,
-          br: "Roman",
-        }}
-      >
-        <p className="type-mega-fit my-[3vw] text-center leading-[0.86]! [font-stretch:113%]">
-          <span className="block">Quiet</span>
-          <span className="block">Luxury</span>
-        </p>
-      </Band>
-      <Band
-        tone="taupe"
-        className="min-h-[34vw]"
-        labels={{
-          tl: "Style",
-          tc: "Pairing no. 2",
-          tr: <Seal />,
-          bl: "Heavy",
-          bc: <span className="type-label">Kalnia 700</span>,
-          br: "Roman",
-        }}
-      >
-        <p className="type-mega my-[1vw] text-center leading-[0.86]!">
-          <span className="block">Old</span>
-          <span className="block">Money</span>
-        </p>
-      </Band>
-      <Band
-        tone="cream"
-        className="min-h-[34vw]"
-        labels={{
-          tl: "Style",
-          tc: "Pairing no. 3",
-          tr: "2026",
-          bl: "Light",
-          bc: <span className="type-label">Kalnia 200</span>,
-          br: "Roman",
-        }}
-      >
-        <p className="type-mega-fit my-[3vw] text-center leading-[0.86]! font-extralight!">
-          <span className="block">Font</span>
-          <span className="block">Pairings</span>
-        </p>
-      </Band>
-
       {/* ---------------------------- Fonts ---------------------------- */}
-      <Heading n="01">Fonts</Heading>
-      <div className="grid gap-px px-(--gutter) md:grid-cols-2">
-        <div className="border-t border-line py-4">
-          <p className="type-label mb-3">Kalnia. Wordmark, mega, h1. Weight 200 to 700.</p>
-          <p className="font-kalnia text-[3.75rem] leading-none font-bold tracking-[-0.03em]">Previously 700</p>
-          <p className="font-kalnia text-[3.75rem] leading-none font-extralight tracking-[-0.02em]">Previously 200</p>
-          <p className="font-kalnia text-[3.75rem] leading-none font-semibold tracking-[-0.02em] [font-stretch:125%]">
-            Wide 125
-          </p>
-        </div>
-        <div className="border-t border-line py-4">
-          <p className="type-label mb-3">Bodoni Moda. Lockups, h2, h3, titles, quotes.</p>
-          <p className="font-bodoni text-[3.75rem] leading-none">Roman line</p>
-          <p className="font-bodoni text-[3.75rem] leading-none italic">Italic line</p>
-        </div>
-        <div className="border-t border-line py-4">
-          <p className="type-label mb-3">
-            Mrs Saint Delafield. Overlap only, four uses on the live site.
-          </p>
-          <p className="font-script -rotate-6 text-[6rem] leading-none">Previously</p>
-        </div>
-        <div className="border-t border-line py-4">
-          <p className="type-label mb-3">Archivo. Three styles.</p>
-          <p className="type-label">Label style: Women / Men / Archive</p>
-          <p className="type-data mt-2">Data style: AW-W-0142 / ₹2,450 / 54 CM</p>
-          <p className="type-body mt-2">Body style: Clothes outlive their first owners.</p>
-        </div>
+      <Heading n="01">Font</Heading>
+      <div className="grid gap-px px-(--gutter) md:grid-cols-3">
+        {[
+          ["Regular 400", "font-normal", "Everything by default, and all text 24px and larger."],
+          ["Medium 500", "font-medium", "Labels and buttons. The seal."],
+          ["Bold 700", "font-bold", "The logo, the bag and checkout total, SOLD / ON HOLD. Nowhere else."],
+        ].map(([name, weight, use]) => (
+          <div key={name} className="border-t border-line py-4">
+            <p className="type-label mb-3">PP Neue Montreal {name}</p>
+            <p className={`type-lead ${weight}`}>Aa Bb Cc 0123456789 ₹ →</p>
+            <p className="type-body mt-3 text-muted">{use}</p>
+          </div>
+        ))}
       </div>
+      <p className="type-body mt-4 px-(--gutter) text-muted">
+        One family, three weights, no italics. Trial files: buy the web license and replace them
+        before deploying.
+      </p>
 
       <Heading n="02">Type scale</Heading>
       <div className="flex flex-col gap-6 overflow-hidden px-(--gutter)">
-        <div>
-          <p className="type-data mb-1">MEGA clamp(5rem, 16vw, 15rem)</p>
-          <p className="type-mega">Owned.</p>
-        </div>
-        <div>
-          <p className="type-data mb-1">H1 clamp(3rem, 8vw, 7.5rem)</p>
-          <p className="type-h1">Archive</p>
-        </div>
-        <div>
-          <p className="type-data mb-1">H2 clamp(2rem, 4.5vw, 4rem)</p>
-          <p className="type-h2">The latest</p>
-        </div>
-        <div>
-          <p className="type-data mb-1">PRODUCT TITLE 1.75rem</p>
-          <p className="type-title">Cream cable-knit cardigan</p>
-        </div>
+        {[
+          ["LOGO", "BOLD 700, 20 → 24PX, UPPERCASE, 0.08EM, LH 1", <Wordmark key="logo" />],
+          ["MEGA", "REGULAR, CLAMP(4REM, 20VW, 22REM), UPPERCASE, −0.03EM, LH 0.85. HERO MARQUEE", <p key="mega" className="type-mega">Owned</p>],
+          ["H1", "REGULAR, CLAMP(2.75REM, 7VW, 6REM), −0.03EM, LH 0.9. PAGE TITLES, STEP NUMBERS", <p key="h1" className="type-h1">Archive</p>],
+          ["H2", "REGULAR, CLAMP(2REM, 4.5VW, 4REM), −0.02EM, LH 0.95. SECTION HEADINGS", <StackLockup key="h2" first="The latest" second="Drop 004" align="left" as="p" />],
+          ["TITLE", "REGULAR, 24 → 28PX, −0.01EM, LH 1.1. PRODUCT TITLES, EMPTY STATES", <p key="title" className="type-title">Cream cable-knit cardigan</p>],
+          ["LEAD", "REGULAR, 18 → 20PX, LH 1.4", <p key="lead" className="type-lead">One of each. Never restocked.</p>],
+          ["BODY", "REGULAR, 15PX, LH 1.55", <p key="body" className="type-body">Clothes outlive their first owners.</p>],
+          ["FIELD", "REGULAR, 16PX, LH 1.4. EVERYTHING TYPED", <p key="field" className="type-field">priya@example.com</p>],
+          ["LABEL", "MEDIUM 500, 12PX, UPPERCASE, 0.08EM, LH 1.35. BUTTONS AT LH 1", <p key="label" className="type-label">Women / Men / Archive</p>],
+          ["DATA", "REGULAR, 12PX, TABULAR, UPPERCASE, 0.04EM, LH 1.35", <p key="data" className="type-data">AW-W-0142 / ₹2,450 / 54 CM / <span className="font-bold">SOLD</span></p>],
+        ].map(([name, spec, sample]) => (
+          <div key={name as string}>
+            <p className="type-data mb-1 text-muted">
+              {name}. {spec}
+            </p>
+            {sample}
+          </div>
+        ))}
+        <p className="type-body text-muted">
+          Kept sizes on a role, set with --type-size: the mobile menu links (h1), the Women / Men
+          panels (mega, 56 → 144px), the footer&apos;s &ldquo;Previously owned.&rdquo; (h2, 48 →
+          96px) and the 404 heading (h1, 16vw, at most 240px).
+        </p>
       </div>
 
       <Heading n="03">Colours</Heading>
@@ -261,8 +145,8 @@ export default function StyleguidePage() {
       <div className="flex flex-wrap items-end gap-12 px-(--gutter)">
         <Seal />
         <Seal />
-        <Wordmark className="text-3xl" />
-        <StackLockup roman="Previously" italic="owned." caption="Est. 2026" as="p" />
+        <Wordmark />
+        <StackLockup first="Previously" second="owned." caption="Est. 2026" as="p" />
       </div>
     </div>
   );

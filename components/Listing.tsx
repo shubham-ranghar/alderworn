@@ -4,7 +4,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import type { Condition, Product } from "@/data/products";
 import { conditionMeaning, pieces, sortNewest, statusOf } from "@/lib/catalog";
-import { ChevronIcon, SliderIcon } from "./Icons";
 import { ProductGrid } from "./ProductCard";
 import { Sheet, SheetBar } from "./Sheet";
 
@@ -101,32 +100,30 @@ function ListingView({
 
   return (
     <>
-      <h1 className="px-(--gutter) py-12 text-center text-[22px] leading-[1.15] font-bold tracking-[0.02em] text-balance uppercase [font-stretch:80%] md:py-22 md:text-[28px]">
+      <h1 className="type-h1 px-(--gutter) pt-8 pb-6 text-balance md:pt-12 md:pb-8">
         {title}
       </h1>
 
       <div className="flex items-center justify-between gap-4 px-(--gutter) py-3">
-        <p role="status" className="text-[14px] leading-[1.35] md:text-[16px]">
-          {pieces(shown.length).toLowerCase()}
+        <p role="status" className="type-data">
+          {pieces(shown.length)}
         </p>
         <div className="flex shrink-0 items-center gap-5 md:gap-7">
           <button
             type="button"
             aria-haspopup="dialog"
             onClick={() => setFilterOpen(true)}
-            className="type-nav link btn-text inline-flex! items-center gap-2 py-1"
+            className="type-label link btn-text py-1"
           >
-            <SliderIcon />
             Filter{activeCount ? ` (${activeCount})` : ""}
           </button>
           <button
             type="button"
             aria-expanded={sortOpen}
             onClick={() => setSortOpen((o) => !o)}
-            className="type-nav link btn-text inline-flex! items-center gap-2 py-1"
+            className="type-label link btn-text py-1"
           >
-            Sort by
-            <ChevronIcon className={`transition-transform duration-300 ${sortOpen ? "rotate-180" : ""}`} />
+            Sort by: {SORTS.find((s) => s.value === sort)?.label}
           </button>
         </div>
       </div>
@@ -150,7 +147,7 @@ function ListingView({
       <h2 className="sr-only">Pieces</h2>
       {shown.length > 0 ? (
         <div className="-mt-px">
-          <ProductGrid products={shown} />
+          <ProductGrid products={shown} cover />
         </div>
       ) : products.length === 0 ? (
         <div className="px-(--gutter) py-20">

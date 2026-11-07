@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { claimWindow, dispatchWindow, SHIPPING_FEE, site } from "@/config/site";
 import type { Product } from "@/data/products";
-import { conditionMeaning, dropName, formatPrice, moreFromDrop, statusOf } from "@/lib/catalog";
+import { conditionMeaning, dropName, formatPrice, isOneSize, moreFromDrop, statusOf } from "@/lib/catalog";
 import { Accordion } from "./Accordion";
+import { AddToBag } from "./AddToBag";
 import { StackLockup } from "./Lockups";
 import { ProductGallery } from "./ProductGallery";
-import { ProductPurchase } from "./ProductPurchase";
 import { ProductRow } from "./ProductCard";
 import { SaveButton } from "./SaveButton";
 
 export function ProductPage({ product }: { product: Product }) {
   const more = moreFromDrop(product);
-  const status = statusOf(product);
+  const sold = statusOf(product) === "sold";
+  // Every piece is one of a kind, so it has one size: the first listed.
+  const size = product.sizes[0] ?? null;
 
   return (
     <>
@@ -19,46 +21,58 @@ export function ProductPage({ product }: { product: Product }) {
         <ProductGallery product={product} />
 
         <div className="px-(--gutter) pt-8 pb-4 md:sticky md:top-(--header-h) md:max-h-[calc(100svh-var(--header-h))] md:overflow-y-auto md:border-l md:border-line md:px-8 md:pt-12 lg:px-12">
-          {/* The padding keeps a long title clear of the heart. The offset puts the heart, not its
-              tap area, on the panel's edge. */}
-          <div className="relative px-8">
-            <StackLockup
-              as="h1"
-              size="type-title"
-              roman={product.title}
-              italic={`circa ${product.era}`}
-              caption={product.code}
-            />
+          {/* 24px between the groups: title, rows, button, accordions. The heart sits on the
+              right of the first title line; the negative margins line its icon, not its 44px tap
+              area, up with the line and the panel's edge. */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h1 className="type-title">
+                <span className="block">{product.title}</span>
+                <span className="block">circa {product.era}</span>
+              </h1>
+              <p className="type-data mt-2">{product.code}</p>
+              <p className={`type-lead mt-1 text-ink ${sold ? "line-through" : ""}`}>
+                <span className="sr-only">{sold ? "Was " : "Price "}</span>
+                {formatPrice(product.price)}
+              </p>
+            </div>
             <SaveButton
               code={product.code}
               title={product.title}
-              className="absolute -top-3 -right-[13px]"
+              className="-mt-2 -mr-[13px] shrink-0"
             />
           </div>
 
-          <dl className="mt-8 border-t border-ink">
-            <div className="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
-              <dt className="type-label">Price</dt>
-              <dd className={`type-data ${status === "sold" ? "line-through" : ""}`}>
-                {formatPrice(product.price)}
-              </dd>
-            </div>
-            {/* A piece that can be bought shows its sizes as buttons instead. */}
-            {status !== "available" ? (
-              <div className="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
-                <dt className="type-label">Size</dt>
-                <dd className="type-data">{product.sizes.map((s) => s.label).join(" / ")}</dd>
-              </div>
-            ) : null}
-            <div className="flex items-baseline justify-between gap-4 border-b border-line py-2.5">
+          <dl className="mt-6 border-t border-ink">
+            <div className="flex items-baseline justify-between gap-4 border-b border-line py-3.5">
               <dt className="type-label">Condition</dt>
               <dd className="type-data text-right">
                 {product.condition}. {conditionMeaning[product.condition]}
               </dd>
             </div>
+            {size ? (
+              <div className="flex items-baseline justify-between gap-4 border-b border-line py-3.5">
+                {isOneSize(size.label) ? (
+                  <>
+                    <dt className="sr-only">Size</dt>
+                    <dd className="type-label">One size</dd>
+                  </>
+                ) : (
+                  <>
+                    <dt className="type-label">Size</dt>
+                    <dd className="type-data text-right">{size.label}</dd>
+                  </>
+                )}
+              </div>
+            ) : null}
           </dl>
 
-          <ProductPurchase product={product}>
+          <div className="mt-6">
+            <AddToBag product={product} size={size} />
+          </div>
+
+          {/* All closed to start. */}
+          <div className="mt-6 border-t border-line">
             <Accordion title="Condition & flaws">
               <p className="type-body">
                 Grade {product.condition}. {conditionMeaning[product.condition]}
@@ -87,7 +101,7 @@ export function ProductPage({ product }: { product: Product }) {
               </p>
               <p className="sr-only">Sold by {site.name}.</p>
             </Accordion>
-          </ProductPurchase>
+          </div>
         </div>
       </article>
 
@@ -95,8 +109,8 @@ export function ProductPage({ product }: { product: Product }) {
         <section className="mt-20 border-t border-ink pt-12 md:mt-32 md:pt-16">
           <div className="mb-10 grid px-(--gutter) md:grid-cols-12">
             <StackLockup
-              roman="More from"
-              italic={dropName(product.drop)}
+              first="More from"
+              second={dropName(product.drop)}
               className="md:col-span-4 md:col-start-8"
             />
           </div>

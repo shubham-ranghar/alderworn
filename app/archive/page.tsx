@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ArchiveGrid } from "@/components/ArchiveGrid";
 import { Band } from "@/components/Band";
 import { site } from "@/config/site";
-import { pieces, soldPieces } from "@/lib/catalog";
+import { soldPieces } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Archive",
@@ -13,21 +13,18 @@ export default function ArchivePage() {
   const sold = soldPieces();
   return (
     <>
+      {/* Sized to its content: with the band's own 12px / 16px padding, the title and line
+          sit 40px below the labels and 40px above the edge on phones, 64px from 768px.
+          The piece count lives in the toolbar below. */}
       <Band
         tone="cream"
-        className="min-h-[60svh]"
-        labels={{
-          tl: "Archive",
-          tc: "Not for sale",
-          tr: site.season,
-          bl: pieces(sold.length),
-          br: "Women / Men",
-        }}
+        contentClassName="relative pt-10 pb-7 text-center md:pt-16 md:pb-12"
+        labels={{ tl: "Archive", tc: "Not for sale", tr: site.season }}
       >
-        <h1 className="type-mega-fit my-12 font-extralight! tracking-[-0.02em]! [--fit:21vw] md:text-center md:[--fit:16vw]">
+        <h1 className="type-h1">
           Archive
         </h1>
-        <p className="type-body -mt-8 mb-10 max-w-[22rem] md:mx-auto md:max-w-none md:text-center">
+        <p className="type-lead mx-auto mt-4 max-w-[22rem] md:max-w-none">
           Sold. Kept here so you know what you missed.
         </p>
       </Band>

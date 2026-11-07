@@ -10,14 +10,14 @@ export function SavedPieces() {
 
   return (
     <>
-      <h1 className="px-(--gutter) py-12 text-center text-[22px] leading-[1.15] font-bold tracking-[0.02em] text-balance uppercase [font-stretch:80%] md:py-22 md:text-[28px]">
+      <h1 className="type-h1 px-(--gutter) py-12 text-center text-balance md:py-22">
         Saved
       </h1>
 
       {!ready ? null : count > 0 ? (
         <>
-          <p role="status" className="px-(--gutter) py-3 text-[14px] leading-[1.35] md:text-[16px]">
-            {pieces(count).toLowerCase()}
+          <p role="status" className="type-data px-(--gutter) py-3">
+            {pieces(count)}
           </p>
           <ProductGrid products={products} />
         </>

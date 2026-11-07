@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #f4f1ec;
-  --cream: #efe8de;
-  --taupe: #d4cbbf;
+  /* Cool neutral palette. The token names are kept from the earlier warm palette for compatibility. */
+  --paper: #ffffff;
+  --cream: #f4f5f7;
+  --taupe: #e4e6ea;
   --ink: #0d0d0d;
-  --muted: #6e6860;
-  --line: rgba(13, 13, 13, 0.15);
-  --seal: #8f7a63;
+  --muted: #5f6368;
+  --line: rgba(13, 13, 13, 0.12);
+  --seal: #1f2a44;
 
   --header-h: 3.5rem;
   --search-h: 3.5rem;
@@ -15,6 +16,14 @@
   --gutter: 1rem;
 
   --hover-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Type sizes for the roles below. The hero reads --type-mega to place its photo. */
+  --type-mega: clamp(4rem, 20vw, 22rem);
+  --type-h1: clamp(2.75rem, 7vw, 6rem);
+  --type-h2: clamp(2rem, 4.5vw, 4rem);
+
+  /* The /bag send bar before the safe area: 1px border, 12px above and below a 52px button. */
+  --bag-bar-h: calc(3.25rem + 1.5rem + 1px);
 }
 
 @media (min-width: 768px) {
@@ -40,13 +49,24 @@
   --drop-shadow-*: initial;
   --blur-*: initial;
 
+  /* One family, three weights: font-normal, font-medium and font-bold are the only weight classes. */
   --font-*: initial;
-  --font-kalnia: var(--font-kalnia-face), serif;
-  --font-bodoni: var(--font-bodoni-face), serif;
-  --font-script: var(--font-script-face), cursive;
-  --font-archivo: var(--font-archivo-face), sans-serif;
+  /* Falls back to Helvetica Neue / Arial while --font-sans-face is unset (see lib/fonts.ts). */
+  --font-sans: var(--font-sans-face, "Helvetica Neue"), "Helvetica Neue", Arial, sans-serif;
+
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
 
   --text-*: initial;
+}
+
+/* Lets a few elements keep a size of their own on top of a role (see Type below). Not
+   inherited, so a role nested inside one of them still gets its own size. */
+@property --type-size {
+  syntax: "*";
+  inherits: false;
 }
 
 /* ------------------------------ Base ------------------------------ */
@@ -61,6 +81,8 @@
   html {
     background: var(--paper);
     color: var(--ink);
+    /* Only the loaded weights and styles: never a faked bold or italic. */
+    font-synthesis: none;
     scrollbar-gutter: stable;
     -webkit-text-size-adjust: 100%;
   }
@@ -72,10 +94,10 @@
   body {
     background: var(--paper);
     color: var(--ink);
-    font-family: var(--font-archivo-face), sans-serif;
+    font-family: var(--font-sans);
     font-size: 15px;
+    font-weight: 400;
     line-height: 1.55;
-    font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -131,90 +153,115 @@
 
 /* ------------------------------ Type ------------------------------ */
 
+/*
+ * One family (PP Neue Montreal, see lib/fonts.ts) and ten roles. Every piece of text uses
+ * one of them; nothing sets its own size, weight, letter-spacing or line-height.
+ *
+ *   Regular 400: everything 24px and larger, plus data, body, lead and field
+ *   Medium 500:  label (buttons are label at line-height 1)
+ *   Bold 700:    the logo, plus `font-bold` on the bag total and SOLD / ON HOLD only
+ *
+ * Nothing is below 12px. mega, h1 and h2 read --type-size first, so the few elements that
+ * keep a size of their own (the mobile menu, the home panels, the footer lockup, the 404
+ * heading) set only that and take everything else from the role.
+ */
+
+@utility type-logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+
+  @media (width >= 48rem) {
+    font-size: 24px;
+  }
+}
+
+/* The hero marquee. */
+@utility type-mega {
+  font-size: var(--type-size, var(--type-mega));
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.85;
+  text-transform: uppercase;
+}
+
+/* Page titles: Women, Men, categories, Saved, Archive, Orders & Returns. */
+@utility type-h1 {
+  font-size: var(--type-size, var(--type-h1));
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  text-transform: none;
+}
+
+/* Section headings; two lines in StackLockup, both in this style. */
+@utility type-h2 {
+  font-size: var(--type-size, var(--type-h2));
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: none;
+}
+
+/* Product titles and empty states. */
+@utility type-title {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-transform: none;
+
+  @media (width >= 48rem) {
+    font-size: 28px;
+  }
+}
+
+@utility type-lead {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+
+  @media (width >= 48rem) {
+    font-size: 20px;
+  }
+}
+
+@utility type-body {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.55;
+  text-transform: none;
+}
+
+/* Typed text. 16px, because iOS zooms the page when focusing anything smaller. */
+@utility type-field {
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+}
+
 @utility type-label {
-  font-family: var(--font-archivo-face), sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  font-stretch: 106%;
   letter-spacing: 0.08em;
   line-height: 1.35;
   text-transform: uppercase;
 }
 
-/* Header rows and the listing's controls. */
-@utility type-nav {
-  font-family: var(--font-archivo-face), sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
 @utility type-data {
-  font-family: var(--font-archivo-face), sans-serif;
   font-size: 12px;
   font-weight: 400;
-  font-stretch: 94%;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   line-height: 1.35;
   text-transform: uppercase;
-}
-
-@utility type-body {
-  font-family: var(--font-archivo-face), sans-serif;
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-/* Heroes only. */
-@utility type-mega {
-  font-family: var(--font-kalnia-face), serif;
-  font-size: clamp(5rem, 16vw, 15rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.88;
-}
-
-/* Mega without the 5rem floor, for words too long to fit a phone at mega. */
-@utility type-mega-fit {
-  font-family: var(--font-kalnia-face), serif;
-  font-size: min(var(--fit-max, 15rem), var(--fit, 16vw));
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 0.88;
-}
-
-@utility type-h1 {
-  font-family: var(--font-kalnia-face), serif;
-  font-size: clamp(3rem, 8vw, 7.5rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 0.92;
-}
-
-@utility type-h2 {
-  font-family: var(--font-bodoni-face), serif;
-  font-size: clamp(2rem, 4.5vw, 4rem);
-  font-weight: 400;
-  /* Above this optical size Bodoni's hairlines vanish: "004" reads as "001". */
-  font-variation-settings: "opsz" 28;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-@utility type-title {
-  font-family: var(--font-bodoni-face), serif;
-  font-size: 1.75rem;
-  font-weight: 400;
-  font-variation-settings: "opsz" 16;
-  letter-spacing: -0.005em;
-  line-height: 1.02;
-}
-
-@utility expanded {
-  font-stretch: 113%;
 }
 
 /* ------------------------------ Links ----------------------------- */
@@ -262,6 +309,10 @@
   }
 }
 
+.group:focus-visible .link-reveal::after {
+  transform: scaleX(1);
+}
+
 @utility link-on {
   text-decoration-line: underline;
   text-underline-offset: 3px;
@@ -281,11 +332,11 @@
   border: 1px solid var(--ink);
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--font-archivo-face), sans-serif;
-  font-size: 11px;
+  /* The label role at line-height 1. */
+  font-size: 12px;
   font-weight: 500;
-  font-stretch: 106%;
   letter-spacing: 0.08em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -351,8 +402,10 @@
   border: 0;
   border-bottom: 1px solid var(--ink);
   padding: 0.5rem 0;
-  font-family: var(--font-archivo-face), sans-serif;
+  /* The field role. */
   font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.4;
 
   &:focus {
@@ -421,6 +474,78 @@ dialog.sheet-side[open] {
   }
 }
 
+/* Centred signup popup over a dark backdrop. Fades up over 200ms; fade only with reduced motion. */
+dialog.sheet-popup {
+  inset: 0;
+  margin: auto;
+  width: min(56.25rem, 100% - 2rem);
+  height: fit-content;
+  max-height: 90svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--ink);
+  opacity: 0;
+  translate: 0 0.75rem;
+  transition:
+    opacity 200ms var(--hover-ease),
+    translate 200ms var(--hover-ease),
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+dialog.sheet-popup[open] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@starting-style {
+  dialog.sheet-popup[open] {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+dialog.sheet-popup::backdrop {
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
+  opacity: 0;
+  transition:
+    opacity 200ms var(--hover-ease),
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+dialog.sheet-popup[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog.sheet-popup[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* The global reduce rule cuts every transition to 0.01ms; the popup keeps its fade. */
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet-popup,
+  dialog.sheet-popup[open] {
+    translate: none;
+    transition-property: opacity, display, overlay;
+  }
+
+  dialog.sheet-popup,
+  dialog.sheet-popup::backdrop {
+    transition-duration: 200ms !important;
+  }
+}
+
+/* /bag below 1024px: the send bar is fixed to the bottom of the screen, so the page ends
+   that much higher and nothing stays hidden behind it. */
+@media (width < 64rem) {
+  body:has(.bag-bar) {
+    padding-bottom: calc(var(--bag-bar-h) + env(safe-area-inset-bottom));
+  }
+}
+
 /* ------------------------------ Rows ------------------------------ */
 
 .scroll-row {
@@ -455,18 +580,8 @@ details[open] > summary .when-closed {
   transition: opacity 300ms var(--hover-ease);
 }
 
-/* Hover devices: the first photo only; sizes appear on hover. */
+/* Hover devices: sizes appear on hover. */
 @media (hover: hover) {
-  .card-photo {
-    position: absolute;
-    inset: 0;
-  }
-
-  .card-photo:not(:first-child),
-  .card-dots {
-    display: none;
-  }
-
   .card-sizes {
     opacity: 0;
   }
@@ -494,29 +609,125 @@ details[open] > summary .when-closed {
   }
 }
 
-/* Touch: photos sit side by side and swipe; dots, title and price always show. */
+/*
+ * The second photo. Only a mouse or trackpad gets it: it fades in over the first on hover
+ * and when the card's link has keyboard focus, and back out on leave. Everywhere else it
+ * stays display: none, so phones and tablets never download it and see the first photo only.
+ * With reduced motion the global rule below cuts the fade to an instant swap.
+ */
+.card-photo-alt {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-photo-alt {
+    display: block;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .card:hover .card-photo-alt,
+  .card-link:focus-visible .card-photo-alt {
+    opacity: 1;
+  }
+}
+
+/* Touch: title and price always show; no sizes. */
 @media (hover: none) {
-  .card-photos {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .card-photos::-webkit-scrollbar {
-    display: none;
-  }
-
-  .card-photo {
-    position: relative;
-    flex: none;
-    width: 100%;
-    height: 100%;
-    scroll-snap-align: start;
-  }
-
   .card-sizes {
     display: none;
+  }
+}
+
+/* ------------------------------ Hero ------------------------------ */
+
+/* The name sits in the upper middle; the photo starts halfway down it and runs to the
+   bottom edge, in front, so the letters slide behind it. */
+.hero {
+  /* The marquee's type-mega size, which the photo is placed against. */
+  --hero-text-size: var(--type-mega);
+  --hero-text-top: 18%;
+}
+
+.hero-marquee {
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-marquee-track {
+  display: flex;
+  width: max-content;
+  /* The type comes from type-mega on the element. */
+  white-space: nowrap;
+  color: var(--paper);
+}
+
+/* Spacing lives on each copy, not as a flex gap, so -50% lands exactly on a copy. */
+.hero-marquee-track > span {
+  padding-right: 0.3em;
+}
+
+/* Phones: a stack. The name starts just under the drop label, running edge to edge;
+   the photo is pulled up over its lower half and capped so the labels below it fit
+   on the first screen. */
+@media (max-width: 639.98px) {
+  .hero-stage {
+    margin-top: 2.5rem;
+  }
+
+  .hero-marquee {
+    position: relative;
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  .hero-photo {
+    position: relative;
+    z-index: 10;
+    /* 70vw, capped at 58svh tall, and at whatever height the header, search row, label
+       and spacing (13.5rem in all) leave, so short phones still fit. */
+    width: min(70vw, 58svh * 0.8, (100svh - var(--header-h) - var(--search-h) - 13.5rem) * 0.8);
+    aspect-ratio: 4 / 5;
+    margin: calc(var(--hero-text-size) * -0.425) auto 0;
+  }
+}
+
+/* 640px and up: both are placed against the whole section. */
+@media (min-width: 640px) {
+  .hero-marquee {
+    position: absolute;
+    top: var(--hero-text-top);
+    left: 0;
+    right: 0;
+  }
+
+  /* Portrait, starting halfway down the name. Taller than the space below it on most
+     screens, so the hero's bottom edge cuts it off. */
+  .hero-photo {
+    position: absolute;
+    top: calc(var(--hero-text-top) + var(--hero-text-size) * 0.425);
+    left: 50%;
+    z-index: 10;
+    width: min(30vw, 560px);
+    aspect-ratio: 4 / 5;
+    translate: -50% 0;
+  }
+
+  /* Women / Men sits on a solid ink tab in case the photo ever reaches it. The negative
+     margin keeps the text on the gutter. */
+  .hero-tag {
+    background: var(--ink);
+    padding: 0.25rem 0.375rem;
+    margin: -0.25rem -0.375rem;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+
+@keyframes hero-marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
 
@@ -531,6 +742,11 @@ details[open] > summary .when-closed {
 
   svg:hover > .seal-ring {
     animation-play-state: paused;
+  }
+
+  .hero-marquee-track {
+    will-change: transform;
+    animation: hero-marquee 28s linear infinite;
   }
 }
 
@@ -575,5 +791,25 @@ details[open] > summary .when-closed {
     .group:hover .link-reveal::after {
       opacity: 1;
     }
+  }
+
+  .group:focus-visible .link-reveal::after {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------ Mobile menu ----------------------- */
+
+/* Entries fade in one after another, 200ms each, 40ms apart. Shown at once with reduced motion. */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.sheet-full[open] .menu-in {
+    animation: menu-in 200ms var(--hover-ease) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
   }
 }

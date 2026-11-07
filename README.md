@@ -197,7 +197,6 @@ error.
 
 ## Design rules worth keeping
 
-- Mrs Saint Delafield appears on four pages only (home, women, men, 404), always overlapping a Kalnia
-  word. `/styleguide` also shows it, for reference.
+- One font, PP Neue Montreal, in Regular, Medium and Bold (trial files until the web license is bought). See `CONTEXT.md`.
 - Only the seven colour tokens. No gradients, shadows or rounded corners.
 - Words instead of icons. The one permitted glyph is →.

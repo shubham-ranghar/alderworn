@@ -1,6 +1,6 @@
 import { SHIPPING_FEE, site } from "@/config/site";
 import type { Product, ProductSize } from "@/data/products";
-import { formatPrice } from "./catalog";
+import { formatPrice, isOneSize } from "./catalog";
 
 /** One line in the bag: a product in one size. */
 export type BagLine = { product: Product; size: ProductSize };
@@ -20,7 +20,7 @@ export function bagMessage(lines: BagLine[], c: Customer) {
     [
       `${i + 1}. ${p.code}`,
       `   ${p.title}`,
-      `   Size: ${size.label}`,
+      isOneSize(size.label) ? "   ONE SIZE" : `   Size: ${size.label}`,
       `   ${formatPrice(p.price)}`,
     ].join("\n"),
   );
@@ -35,7 +35,7 @@ export function bagMessage(lines: BagLine[], c: Customer) {
     `Total: ${formatPrice(subtotal + SHIPPING_FEE)}`,
     "",
     `Name: ${c.name.trim()}`,
-    `Phone: ${c.phone.trim()}`,
+    `Phone: +91 ${c.phone.replace(/\s/g, "")}`,
     `Address: ${c.address.trim()}`,
     `City: ${c.city.trim()}`,
     `Pincode: ${c.pincode.trim()}`,

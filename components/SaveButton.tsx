@@ -18,8 +18,7 @@ export function SaveButton({
   return (
     <button
       type="button"
-      aria-pressed={saved}
-      aria-label={`Save ${title}`}
+      aria-label={saved ? `Remove ${title} from wishlist` : `Add ${title} to wishlist`}
       onClick={() => toggle(code)}
       className={`flex size-11 items-center justify-center text-ink ${className}`}
     >

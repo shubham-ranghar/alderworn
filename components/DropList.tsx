@@ -4,7 +4,7 @@ import { useId, useState, type FormEvent } from "react";
 import { site } from "@/config/site";
 
 /** Emails each signup to the owner through Web3Forms. See README for the access key. */
-async function sendSignup(data: FormData) {
+export async function sendSignup(data: FormData) {
   if (!site.dropListAccessKey) return false;
 
   const res = await fetch("https://api.web3forms.com/submit", {
@@ -39,37 +39,49 @@ export function DropList({ className = "" }: { className?: string }) {
 
   return (
     <div className={className}>
-      <h2 className="type-label mb-1 md:pt-[5px]">The drop list</h2>
+      <h2 className="type-label mb-1">The drop list</h2>
       <p className="type-body" id={`${id}-copy`}>
         One message before every drop. Nothing else.
       </p>
       {status === "done" ? (
         <p role="status" className="type-body mt-3 border-b border-ink py-2">
-          Noted. You&apos;ll hear from us before the next drop.
+          You&apos;re on the list.
         </p>
       ) : (
         <form onSubmit={join} className="mt-3">
           {/* Honeypot: hidden from people, so only bots tick it. */}
           <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" className="hidden" />
-          <label htmlFor={`${id}-email`} className="type-label">
-            Email
+          {/* The placeholder carries the prompt, so the label is for screen readers only. */}
+          <label htmlFor={`${id}-email`} className="sr-only">
+            Email address
           </label>
-          <div className="flex items-baseline gap-4 border-b border-ink">
+          <div className="flex items-center gap-4 border-b border-ink">
             <input
               id={`${id}-email`}
               name="email"
               type="email"
               required
               autoComplete="email"
+              placeholder="Your email address"
               aria-describedby={`${id}-copy`}
-              className="field min-w-0 flex-1 border-b-0! focus:p-[0.5rem_0]!"
+              aria-invalid={status === "error" || undefined}
+              aria-errormessage={status === "error" ? `${id}-error` : undefined}
+              className="field min-w-0 flex-1 border-b-0! placeholder:text-muted focus:p-[0.5rem_0]!"
             />
-            <button type="submit" disabled={status === "sending"} className="type-label link py-2.5">
-              {status === "sending" ? "Joining" : "Join"}
+            {/* The ::before widens the tap area to 44px+ without moving the underline. */}
+            <button
+              type="submit"
+              disabled={status === "sending"}
+              className="type-label link shrink-0 py-2.5 whitespace-nowrap before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-['']"
+            >
+              {status === "sending" ? "Sending…" : "Join →"}
             </button>
           </div>
+          <p aria-live="polite" className="sr-only">
+            {status === "sending" ? "Sending…" : ""}
+          </p>
           {status === "error" && (
-            <p role="alert" className="type-body mt-2">
+            <p id={`${id}-error`} role="alert" className="type-body mt-2">
               That didn&apos;t go through. Please try again.
             </p>
           )}

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Band } from "@/components/Band";
-import { ScriptLockup, StackLockup } from "@/components/Lockups";
+import { StackLockup } from "@/components/Lockups";
 import { ProductRow } from "@/components/ProductCard";
 import { Seal } from "@/components/Seal";
 import { ORDER_STEPS, site } from "@/config/site";
@@ -18,25 +17,27 @@ import {
 /** Short titles for the home page's ORDER_STEPS, in the same order. */
 const STEP_TITLES = ["Choose", "Send", "Hold", "Pay & ship"];
 
+/**
+ * The whole panel is the link. The name and count sit in the top row and the big name at
+ * the bottom left; its thin underline grows on hover and keyboard focus (.link-reveal).
+ */
 function EntryPanel({
   href,
   word,
   tone,
   image,
   count,
-  align,
 }: {
   href: string;
   word: string;
   tone: "cream" | "taupe";
   image: string | null;
   count: number;
-  align: "start" | "end";
 }) {
   return (
     <Link
       href={href}
-      className={`group relative flex min-h-[72svh] flex-col overflow-hidden p-(--gutter) md:min-h-svh ${tone === "cream" ? "bg-cream" : "bg-taupe"} ${align === "end" ? "justify-end" : "justify-between"}`}
+      className={`group relative flex min-h-[50svh] flex-col justify-between overflow-hidden p-(--gutter) md:min-h-[70svh] ${tone === "cream" ? "bg-cream" : "bg-taupe"}`}
     >
       {image ? (
         <Image
@@ -47,15 +48,11 @@ function EntryPanel({
           className="object-cover"
         />
       ) : null}
-      <span
-        className={`relative flex justify-between ${align === "end" ? "order-2 mt-auto" : ""}`}
-      >
+      <span className="relative flex justify-between gap-4">
         <span className="type-label">{word}</span>
         <span className="type-data">{pieces(count)}</span>
       </span>
-      <span
-        className={`link-reveal w-fit type-mega-fit [--fit:23vw] [--link-offset:-0.08em] [--link-thickness:0.03em] md:[--fit:11vw] ${align === "end" ? "order-1 mb-auto" : ""}`}
-      >
+      <span className="link-reveal type-mega w-fit [--type-size:clamp(3.5rem,9vw,9rem)]">
         {word}
       </span>
     </Link>
@@ -67,27 +64,52 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Just below the sticky row. Above page content, below the z-40 header and the search
-          panel; the bag and menu are modal dialogs, so they always cover it. */}
-      <Seal className="fixed top-[calc(var(--header-h)+0.75rem)] right-(--gutter) z-30 md:top-[calc(var(--header-h)+1rem)]" />
+      {/* Just below the sticky row, at the top of the hero, and it scrolls away with the hero.
+          Above page content, below the z-40 header and the search panel; the bag and menu are
+          modal dialogs, so they always cover it. The paper disc keeps it legible over the dark
+          hero. */}
+      <Seal
+        disc
+        className="absolute top-[calc(var(--header-h)+0.75rem)] right-(--gutter) z-30 max-sm:h-16 max-sm:w-16 md:top-[calc(var(--header-h)+1rem)]"
+      />
 
-      {/* Hero: script use 1 of 2 */}
-      <Band
-        tone="cream"
-        className="min-h-[calc(100svh-var(--header-h)-var(--search-h))]"
-        contentClassName="static"
-        labels={{
-          tl: dropLabel(currentDrop),
-          /* Holds the row's height for the fixed seal below, so the headline stays put. */
-          tr: <Seal className="invisible" />,
-          bl: "One of each",
-          bc: (
-            <p className="type-body max-md:max-w-[9rem]">
-              One of each. Never restocked.
-            </p>
-          ),
-          br: (
-            <span>
+      {/* Hero: the name runs behind the photo in an endless loop (Hero in globals.css).
+          From 640px it matches a Band: the drop label top left, the tagline bottom left and
+          Women / Men bottom right, with the portrait photo and the name positioned against
+          the whole section. Below 640px it is a plain stack, with the tagline and Women / Men
+          in one row under the photo. */}
+      <section className="hero relative isolate flex flex-col overflow-hidden bg-ink px-(--gutter) py-3 text-paper max-sm:pb-5 sm:h-[calc(100svh-var(--header-h)-var(--search-h))] md:py-4">
+        <div className="type-label relative z-20 grid grid-cols-[1fr_auto_1fr] items-start gap-3">
+          <div>{dropLabel(currentDrop)}</div>
+        </div>
+        <div className="hero-stage flex min-w-0 flex-col justify-center sm:static sm:flex-1">
+          <h1 className="sr-only">
+            {site.name} — {site.tagline}
+          </h1>
+          <div aria-hidden="true" className="hero-marquee">
+            <div className="hero-marquee-track type-mega">
+              {/* Four copies: each half of the track is wider than any screen, so the loop never shows a gap. */}
+              {[0, 1, 2, 3].map((i) => (
+                <span key={i}>{site.name}</span>
+              ))}
+            </div>
+          </div>
+          <div className="hero-photo">
+            <Image
+              src={site.homeImages.hero}
+              alt="Model in a red satin top and grey wide-leg jeans"
+              fill
+              sizes="(min-width: 640px) min(30vw, 560px), 70vw"
+              loading="eager"
+              fetchPriority="high"
+              className="object-cover object-[77%_top] sm:object-[81%_center]"
+            />
+          </div>
+        </div>
+        <div className="relative z-20 flex items-end justify-between gap-x-4 max-sm:mt-6">
+          <p className="type-lead">One of each. Never restocked.</p>
+          <div className="type-label shrink-0 text-right whitespace-nowrap">
+            <span className="hero-tag">
               <Link href="/women" className="link">
                 Women
               </Link>{" "}
@@ -96,39 +118,9 @@ export default function HomePage() {
                 Men
               </Link>
             </span>
-          ),
-        }}
-      >
-        {/* Desktop margins reserve the script's height (1.01em) on short windows. Their
-            difference stays 0.5em, so the word sits where it did whenever there is room. */}
-        <ScriptLockup
-          script="Previously"
-          word="Owned."
-          wordClass="type-mega-fit [--fit:23vw] [--fit-max:22rem] md:[--fit:16.5vw] md:expanded"
-          scriptStyle={{
-            fontFamily: "var(--font-bodoni-face), serif",
-            fontStyle: "italic",
-            fontSize: "0.7em",
-            fontWeight: 500,
-            fontVariationSettings: '"opsz" 11',
-            top: "-0.82em",
-            left: "calc(7vw - var(--gutter))",
-            rotate: "0deg",
-          }}
-          className="z-10 mt-[1.1em] mb-[calc(50svh-var(--search-h))] ml-[-0.01em] text-paper mix-blend-difference md:mb-[calc(47svh-var(--search-h))] lg:mt-[calc(1.01em+0.75rem-95px)] lg:mb-[calc(0.51em+0.75rem-95px)]"
-        />
-        <div className="absolute inset-0">
-          <Image
-            src={site.homeImages.hero}
-            alt="Model in a red satin top and grey wide-leg jeans"
-            fill
-            sizes="100vw"
-            loading="eager"
-            fetchPriority="high"
-            className="object-cover object-[77%_top] md:object-[73%_top]"
-          />
+          </div>
         </div>
-      </Band>
+      </section>
 
       {/* Split entry */}
       <div className="grid md:grid-cols-2">
@@ -138,7 +130,6 @@ export default function HomePage() {
           tone="cream"
           image={site.homeImages.women}
           count={inSection("women").length}
-          align="start"
         />
         <EntryPanel
           href="/men"
@@ -146,41 +137,32 @@ export default function HomePage() {
           tone="taupe"
           image={site.homeImages.men}
           count={inSection("men").length}
-          align="end"
         />
       </div>
 
-      {/* Latest drop */}
-      <section className="pt-20 md:pt-32">
-        <div className="mb-10 grid px-(--gutter) md:mb-14 md:grid-cols-12">
-          <StackLockup
-            roman="The latest"
-            italic={dropName(currentDrop)}
-            caption={dropDate(currentDrop)}
-            className="md:col-span-4 md:col-start-2"
-          />
+      {/* Latest drop. The id is the target of the archive's empty-state link. */}
+      <section id="latest-drop" className="scroll-mt-(--header-h) pt-12 md:pt-20">
+        <div className="mb-10 px-(--gutter) md:mb-14">
+          <StackLockup first="The latest" second={dropName(currentDrop)} align="left" />
+          <p className="type-label mt-5">{dropDate(currentDrop)}</p>
         </div>
+        {/* There is no page per drop, so "View all" goes to /women. */}
         <ProductRow
           products={drop}
           label={`Pieces from ${dropName(currentDrop)}`}
+          carousel
+          viewAllHref="/women"
         />
       </section>
 
       {/* How it works */}
-      {/* The footer brings its own top margin, so that sets the space below: 96px on phones,
-          and 160px less the 64px pulled back here on desktop. */}
-      <section className="px-(--gutter) pt-24 md:-mb-16">
+      {/* The footer brings its own top margin, so that sets the space below. Below 640px,
+          the last step's 32px plus the footer's 96px, less the 64px pulled back here, leaves
+          64px. 640-767px: 32 + 96 - 48 = 80px. From 768px: 32 + 160 - 112 = 80px. */}
+      <section className="px-(--gutter) pt-24 max-sm:-mb-16 sm:-mb-12 md:-mb-28">
         <div className="flex items-start justify-between">
-          <StackLockup
-            roman="How it"
-            italic="works"
-            align="left"
-            size="type-h2 text-[clamp(1.75rem,3.2vw,3rem)]!"
-          />
-          {/* The negative margin stops the trailing letter-space pulling it off the gutter. */}
-          <p className="type-label mr-[-0.2em] tracking-[0.2em]!">
-            The process
-          </p>
+          <StackLockup first="How it" second="works" align="left" />
+          <p className="type-label">The process</p>
         </div>
         <ol className="mt-10 grid grid-cols-1 border-t border-ink min-[400px]:grid-cols-2 md:mt-14 lg:grid-cols-4">
           {ORDER_STEPS.map((step, i) => (
@@ -188,13 +170,13 @@ export default function HomePage() {
               key={step}
               className="border-line pt-6 pb-8 not-first:border-t min-[400px]:even:border-l min-[400px]:even:pl-4 min-[400px]:odd:pr-4 min-[400px]:nth-[2]:border-t-0 lg:border-t-0! lg:pr-6! lg:pl-6! lg:first:pl-0! lg:last:pr-0! lg:not-first:border-l"
             >
-              <span className="ml-[-0.05em] block font-kalnia text-[3.5rem] font-[200] leading-[0.9] text-seal lg:text-[clamp(4rem,8vw,8rem)]">
+              <span className="type-h1 ml-[-0.05em] block text-seal">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-5 text-[12px] font-[500] uppercase leading-[1.35] tracking-[0.2em]">
+              <h3 className="type-label mt-5">
                 {STEP_TITLES[i]}
               </h3>
-              <p className="mt-2 max-w-[28ch] text-[17px] leading-[1.5] text-ink text-pretty">
+              <p className="type-body mt-2 max-w-[28ch] text-pretty text-ink">
                 {step}
               </p>
             </li>

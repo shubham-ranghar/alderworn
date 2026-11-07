@@ -24,6 +24,9 @@ secrets.*
 # Cloudflare local preview
 .wrangler/
 
+# Vercel
+.vercel/
+
 # Logs
 npm-debug.log*
 *.log

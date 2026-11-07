@@ -14,6 +14,12 @@ export const DISPATCH_DAYS: number = 2;
 /** How long after delivery a customer can report a piece that doesn't match its description. */
 export const CLAIM_HOURS: number = 48;
 
+/**
+ * PLACEHOLDER: how soon a refund is paid once a piece that didn't match its description
+ * is back with you. Shown in the Returns section of /info.
+ */
+export const REFUND_DAYS: number = 7;
+
 /** PLACEHOLDER: flat shipping fee in rupees, added to every bag. */
 export const SHIPPING_FEE = 150;
 
@@ -28,6 +34,30 @@ const count = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"}`;
 export const holdWindow = count(HOLD_HOURS, "hour");
 export const dispatchWindow = count(DISPATCH_DAYS, "day");
 export const claimWindow = count(CLAIM_HOURS, "hour");
+export const refundWindow = count(REFUND_DAYS, "day");
+
+/** Payment and returns policy, worded once for every place in the ordering flow. */
+export const POLICY = {
+  /** Product page, under the bag button. */
+  product: `Prepaid by UPI · Ships in ${dispatchWindow} · No returns for change of mind`,
+  /** The /bag page, above the send button. Shown in capitals. */
+  bag: "Prepaid only · No COD · No returns for change of mind",
+  /** The bag drawer, under "Continue to details". */
+  drawer: "Prepaid by UPI. Nothing is charged here.",
+  /** The /bag page, under the totals. */
+  confirm: `We confirm your pieces, hold them for ${holdWindow} and send UPI details. Prepaid orders only.`,
+  /** Where the bag's "Details →" link goes. */
+  detailsHref: "/info#returns",
+  /**
+   * The Returns section of /info, one paragraph each.
+   * PLACEHOLDER: confirm the remedy (refund or exchange) before going live.
+   */
+  returns: [
+    "No returns for change of mind. Every sale is final.",
+    `If a piece doesn't match its description, message us on WhatsApp within ${claimWindow} of delivery, with an unboxing video.`,
+    `Once we've seen the video, we arrange the return. When the piece is back with us, you choose: a full refund by UPI within ${refundWindow}, or an exchange for another piece.`,
+  ],
+};
 
 export const ORDER_STEPS = [
   "Add pieces to your bag.",
@@ -58,6 +88,13 @@ export const site = {
    * the key was created for. The form shows an error until this is set.
    */
   dropListAccessKey: "" as string,
+
+  /** Copy for the drop list popup on home, /women and /men. */
+  dropListPopup: {
+    headline: "Join the drop list",
+    subtext: "First look at every new drop, before it goes public. One of each, so early matters.",
+    note: "Only drop alerts. Unsubscribe anytime.",
+  },
 
   /** PLACEHOLDER */
   instagramUrl: "https://instagram.com/alderworn",

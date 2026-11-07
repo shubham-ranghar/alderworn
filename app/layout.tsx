@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { BagDrawer } from "@/components/BagDrawer";
 import { BagProvider } from "@/components/BagProvider";
+import { DropListPopup } from "@/components/DropListPopup";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { site } from "@/config/site";
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: { siteName: site.name, type: "website", locale: "en_IN" },
 };
 
-export const viewport: Viewport = { themeColor: "#F4F1EC" };
+export const viewport: Viewport = { themeColor: "#FFFFFF" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main id="main">{children}</main>
           <Footer />
           <BagDrawer />
+          <DropListPopup />
         </BagProvider>
       </body>
     </html>

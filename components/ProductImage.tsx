@@ -4,7 +4,8 @@ import { isPlaceholder, placeholderTone } from "@/lib/catalog";
 /**
  * One product photo, or a flat placeholder panel until real photos exist.
  * Fills its positioned parent. `contain` shows the whole garment, its background
- * merging into the panel behind it.
+ * merging into the panel behind it. `flat` gives the one plain placeholder used by the
+ * edge-to-edge cards: cream, with the code in muted text.
  */
 export function ProductImage({
   src,
@@ -15,6 +16,7 @@ export function ProductImage({
   priority = false,
   dim = false,
   contain = false,
+  flat = false,
 }: {
   src: string;
   code: string;
@@ -24,11 +26,12 @@ export function ProductImage({
   priority?: boolean;
   dim?: boolean;
   contain?: boolean;
+  flat?: boolean;
 }) {
   if (isPlaceholder(src)) {
     const tone = placeholderTone(code, index);
     // A cream panel would vanish into a cream tile.
-    const panel = tone === "taupe" ? "bg-taupe" : contain ? "bg-paper" : "bg-cream";
+    const panel = flat ? "bg-cream" : tone === "taupe" ? "bg-taupe" : contain ? "bg-paper" : "bg-cream";
     return (
       <div
         role={alt ? "img" : undefined}
@@ -36,7 +39,7 @@ export function ProductImage({
         aria-hidden={alt ? undefined : true}
         className={`absolute inset-0 ${panel} ${dim ? "opacity-40" : ""}`}
       >
-        <span className="type-data absolute bottom-2 left-2">{code}</span>
+        <span className={`type-data absolute bottom-2 left-2 ${flat ? "text-muted" : ""}`}>{code}</span>
       </div>
     );
   }

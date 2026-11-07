@@ -7,7 +7,14 @@ const RING_TEXT = "ALDERWORN · HOUSE OF SECOND OWNERS · EST. 2026 ·";
  * globals.css) live here so every seal stays in sync. Use `className` for
  * placement only, never for size.
  */
-export function Seal({ className = "" }: { className?: string }) {
+export function Seal({
+  className = "",
+  disc = false,
+}: {
+  className?: string;
+  /** Fills the seal with paper so it stays legible over dark sections. */
+  disc?: boolean;
+}) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   return (
     <svg
@@ -19,7 +26,7 @@ export function Seal({ className = "" }: { className?: string }) {
         cx="100"
         cy="100"
         r="98"
-        fill="none"
+        fill={disc ? "var(--paper)" : "none"}
         stroke="var(--seal)"
         strokeWidth="1"
         vectorEffect="non-scaling-stroke"
@@ -31,7 +38,7 @@ export function Seal({ className = "" }: { className?: string }) {
         <text
           fill="var(--seal)"
           style={{
-            fontFamily: "var(--font-archivo-face), sans-serif",
+            fontFamily: "var(--font-sans)",
             fontSize: 14,
             fontWeight: 500,
           }}
@@ -43,15 +50,14 @@ export function Seal({ className = "" }: { className?: string }) {
       </g>
       <text
         x="100"
-        y="121"
+        y="124"
         textAnchor="middle"
         fill="var(--seal)"
         style={{
-          fontFamily: "var(--font-bodoni-face), serif",
-          fontStyle: "italic",
-          fontSize: 62,
+          fontFamily: "var(--font-sans)",
+          // 76 of 200 units: 24px on the smallest (64px) seal.
+          fontSize: 76,
           fontWeight: 500,
-          fontVariationSettings: "\"opsz\" 11",
         }}
       >
         AW

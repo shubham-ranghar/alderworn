@@ -19,6 +19,12 @@ const OLD_KEY = "alderworn.bag.v1";
 
 type Saved = { code: string; size: string };
 
+/**
+ * What the drawer shows: "added" is just the piece that was added a moment ago, "bag" is
+ * everything in the bag.
+ */
+export type DrawerView = { view: "added"; code: string; size: string } | { view: "bag" };
+
 type BagContextValue = {
   items: BagLine[];
   count: number;
@@ -26,8 +32,14 @@ type BagContextValue = {
   add: (code: string, size: string) => void;
   remove: (code: string, size: string) => void;
   drawerOpen: boolean;
+  drawer: DrawerView | null;
+  /** Opens the full bag. Takes no arguments, so it can be an onClick handler as it is. */
   openDrawer: () => void;
+  /** Adds a piece and opens the drawer on it alone. */
+  addAndShow: (code: string, size: string) => void;
   closeDrawer: () => void;
+  /** Bumped on every add, so the "Added to bag" announcement repeats for a second piece. */
+  addedAt: number;
 };
 
 const BagContext = createContext<BagContextValue | null>(null);
@@ -67,7 +79,8 @@ const same = (l: Saved, code: string, size: string) => l.code === code && l.size
 
 export function BagProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<Saved[]>([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawer, setDrawer] = useState<DrawerView | null>(null);
+  const [addedAt, setAddedAt] = useState(0);
   const pathname = usePathname();
 
   // localStorage only exists after hydration, and other tabs can change it.
@@ -80,7 +93,7 @@ export function BagProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  useEffect(() => setDrawerOpen(false), [pathname]);
+  useEffect(() => setDrawer(null), [pathname]);
 
   const update = useCallback((next: (prev: Saved[]) => Saved[]) => {
     setLines((prev) => {
@@ -96,19 +109,27 @@ export function BagProvider({ children }: { children: ReactNode }) {
       const size = product?.sizes.find((s) => s.label === l.size);
       return product && size ? [{ product, size }] : [];
     });
+    // Each size of a product can only be in the bag once.
+    const add = (code: string, size: string) =>
+      update((prev) => (prev.some((l) => same(l, code, size)) ? prev : [...prev, { code, size }]));
     return {
       items,
       count: items.length,
       has: (code, size) => lines.some((l) => same(l, code, size)),
-      // Each size of a product can only be in the bag once.
-      add: (code, size) =>
-        update((prev) => (prev.some((l) => same(l, code, size)) ? prev : [...prev, { code, size }])),
+      add,
       remove: (code, size) => update((prev) => prev.filter((l) => !same(l, code, size))),
-      drawerOpen,
-      openDrawer: () => setDrawerOpen(true),
-      closeDrawer: () => setDrawerOpen(false),
+      drawerOpen: drawer !== null,
+      drawer,
+      openDrawer: () => setDrawer({ view: "bag" }),
+      addAndShow: (code, size) => {
+        add(code, size);
+        setDrawer({ view: "added", code, size });
+        setAddedAt(Date.now());
+      },
+      closeDrawer: () => setDrawer(null),
+      addedAt,
     };
-  }, [lines, drawerOpen, update]);
+  }, [lines, drawer, addedAt, update]);
 
   return <BagContext.Provider value={value}>{children}</BagContext.Provider>;
 }

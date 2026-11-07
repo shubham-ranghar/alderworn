@@ -47,20 +47,3 @@ export function SearchIcon({ className }: { className?: string }) {
     </Icon>
   );
 }
-
-export function SliderIcon({ className }: { className?: string }) {
-  return (
-    <Icon size={16} className={className}>
-      <path d="M1.75 5.25h4M10.75 5.25h5.5M1.75 12.75h8M14.75 12.75h1.5" />
-      <path d="M6.25 3h3.5v4.5h-3.5zM10.5 10.5H14V15h-3.5z" />
-    </Icon>
-  );
-}
-
-export function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <Icon size={14} className={className}>
-      <path d="M3.5 6.75L9 12.25l5.5-5.5" />
-    </Icon>
-  );
-}

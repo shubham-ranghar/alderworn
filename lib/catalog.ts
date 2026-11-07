@@ -45,6 +45,10 @@ export const formatPrice = (n: number) =>
 export const dropLabel = (n: number) => `DROP ${String(n).padStart(3, "0")}`;
 export const dropName = (n: number) => `Drop ${String(n).padStart(3, "0")}`;
 
+/** "One size" has nothing to add after it, so it reads ONE SIZE rather than SIZE ONE SIZE. */
+export const isOneSize = (label: string) => label.trim().toLowerCase() === "one size";
+export const sizeText = (label: string) => (isOneSize(label) ? "ONE SIZE" : `SIZE ${label}`);
+
 export const pieces = (n: number) => `${n} ${n === 1 ? "PIECE" : "PIECES"}`;
 
 export const currentDrop = Math.max(...products.map((p) => p.drop));

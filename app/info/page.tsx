@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import {
-  claimWindow,
   dispatchWindow,
   holdWindow,
   ORDER_STEPS,
+  POLICY,
   SHIPPING_FEE,
   site,
 } from "@/config/site";
 import { formatPrice } from "@/lib/catalog";
+import { Faq, InfoNav } from "@/components/InfoSections";
 
 export const metadata: Metadata = {
-  title: "Information",
-  description: "How ordering, payment, shipping and returns work at ALDERWORN.",
+  title: "Orders & Returns",
+  description:
+    "Orders & Returns at ALDERWORN: how ordering, payment, shipping and returns work, plus care, FAQ and contact.",
 };
 
 const FAQ: [string, string][] = [
@@ -38,11 +40,19 @@ const FAQ: [string, string][] = [
   ],
 ];
 
-function Block({ id, roman, italic, children }: { id: string; roman: string; italic?: string; children: ReactNode }) {
+/*
+ * 48px between sections on phones, 64px from 768px; none after the last, so the
+ * footer's own top margin sets the space below Contact. scroll-margin-top keeps each
+ * heading clear of the sticky header, and below 768px of the sticky link row too.
+ */
+function Block({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-[calc(var(--header-h)+1rem)] border-t border-ink pt-3 pb-14 md:pb-24">
-      <h2 className="type-h2 mb-6 leading-[0.92]!">
-        {roman} {italic ? <em>{italic}</em> : null}
+    <section
+      id={id}
+      className="scroll-mt-[calc(var(--header-h)+var(--info-nav-h)+1rem)] border-t border-ink pt-3 pb-12 last:pb-0 md:scroll-mt-[calc(var(--header-h)+1rem)] md:pb-16"
+    >
+      <h2 className="type-h2 mb-6">
+        {title}
       </h2>
       <div className="type-body flex max-w-[36rem] flex-col gap-3">{children}</div>
     </section>
@@ -62,28 +72,17 @@ const INDEX: [string, string][] = [
 export default function InfoPage() {
   return (
     <>
-      <div className="overflow-hidden px-(--gutter) pt-10 pb-14 md:pt-16 md:pb-24">
-        <h1 className="type-mega-fit font-extralight! [--fit:14.5vw]">Information</h1>
-      </div>
+      <h1 className="type-h1 px-(--gutter) py-8 text-balance md:py-12">
+        Orders &amp; Returns
+      </h1>
 
-      <div className="grid px-(--gutter) md:grid-cols-12">
-        <nav
-          aria-label="On this page"
-          className="mb-12 self-start md:sticky md:top-[calc(var(--header-h)+1rem)] md:col-span-3 md:mb-0"
-        >
-          <ul className="flex flex-col gap-1.5 border-t border-ink pt-3">
-            {INDEX.map(([id, label]) => (
-              <li key={id}>
-                <a href={`#${id}`} className="type-label link">
-                  {label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      {/* --info-nav-h: the sticky link row below 768px. The -64px from 768px takes the
+          footer's 160px top margin down to 96px after Contact (phones: its 96px as is). */}
+      <div className="grid px-(--gutter) [--info-nav-h:2.875rem] md:-mb-16 md:grid-cols-12">
+        <InfoNav items={INDEX} />
 
         <div className="md:col-span-8 md:col-start-5">
-          <Block id="ordering" roman="How ordering" italic="works">
+          <Block id="ordering" title="How ordering works">
             <p>Nothing is bought on this site. It works the old way, by asking.</p>
             <ol className="flex flex-col gap-1">
               {ORDER_STEPS.map((step, i) => (
@@ -96,7 +95,7 @@ export default function InfoPage() {
             <p>First confirmed request gets the piece. There is only the one.</p>
           </Block>
 
-          <Block id="payment" roman="Payment">
+          <Block id="payment" title="Payment">
             <p>
               Prepaid only. No cash on delivery. After we confirm your request on WhatsApp, pay by
               UPI within the hold window and send the transaction ID. Your order is confirmed once
@@ -104,7 +103,7 @@ export default function InfoPage() {
             </p>
           </Block>
 
-          <Block id="shipping" roman="Shipping">
+          <Block id="shipping" title="Shipping">
             <p>
               Tracked courier across India, at a flat {formatPrice(SHIPPING_FEE)}. Your order ships
               within {dispatchWindow} of payment. You get the tracking number on WhatsApp. Pieces go
@@ -112,14 +111,13 @@ export default function InfoPage() {
             </p>
           </Block>
 
-          <Block id="returns" roman="Returns">
-            <p>
-              All sales are final. If a piece doesn&apos;t match its description, message us within{" "}
-              {claimWindow} of delivery with an unboxing video and we&apos;ll make it right.
-            </p>
+          <Block id="returns" title="Returns">
+            {POLICY.returns.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
           </Block>
 
-          <Block id="care" roman="Care">
+          <Block id="care" title="Care">
             <p>
               Wool: air it often, wash it rarely, fold it, never hang it. Silk: cold water or a good
               dry cleaner. Tailoring: a wide hanger and a brush. Waxed cotton: never the machine.
@@ -127,24 +125,11 @@ export default function InfoPage() {
             <p>These clothes have already lasted. Most of the work is leaving them alone.</p>
           </Block>
 
-          <Block id="faq" roman="Frequently" italic="asked">
-            <div className="border-t border-line">
-              {FAQ.map(([q, a]) => (
-                <details key={q} className="border-b border-line">
-                  <summary className="flex items-baseline justify-between gap-4 py-3">
-                    <span>{q}</span>
-                    <span aria-hidden="true" className="type-label">
-                      <span className="when-closed">+</span>
-                      <span className="when-open">−</span>
-                    </span>
-                  </summary>
-                  <p className="pb-4 text-muted">{a}</p>
-                </details>
-              ))}
-            </div>
+          <Block id="faq" title="Frequently asked">
+            <Faq items={FAQ} />
           </Block>
 
-          <Block id="contact" roman="Contact">
+          <Block id="contact" title="Contact">
             <ul className="type-label flex flex-col gap-2">
               <li>
                 <a
@@ -156,7 +141,8 @@ export default function InfoPage() {
                   WhatsApp →
                 </a>
               </li>
-              <li>
+              <li className="flex flex-wrap gap-x-3">
+                <span>Email</span>
                 <a href={`mailto:${site.email}`} className="link-on normal-case">
                   {site.email}
                 </a>

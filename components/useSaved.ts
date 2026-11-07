@@ -47,6 +47,11 @@ const toggle = (code: string) => {
   listeners.forEach((l) => l());
 };
 
+/** Adds a piece, leaving it saved if it already was (unlike toggle). */
+const save = (code: string) => {
+  if (!getSnapshot().includes(code)) toggle(code);
+};
+
 /** The visitor's saved pieces, kept in this browser. No account involved. */
 export function useSaved() {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
@@ -58,5 +63,6 @@ export function useSaved() {
     ready: snapshot !== null,
     isSaved: (code: string) => snapshot?.includes(code) ?? false,
     toggle,
+    save,
   };
 }
